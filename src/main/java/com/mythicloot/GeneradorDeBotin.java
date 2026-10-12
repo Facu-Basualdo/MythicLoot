@@ -149,8 +149,9 @@ public final class GeneradorDeBotin {
 
 	/**
 	 * Suma los afijos que son atributos a los que el objeto ya trae de vanilla (el daño de la espada, la armadura del
-	 * peto): si se pusiera un componente nuevo, la espada perdería su daño. El id lleva el grupo de slots porque dos
-	 * piezas con el mismo id en el mismo atributo se pisan: la segunda reemplaza a la primera y no suman.
+	 * peto): si se pusiera un componente nuevo, la espada perdería su daño. Los que agrega {@link #sumar} llevan el grupo
+	 * de slots en el id porque dos piezas con el mismo id en el mismo atributo se pisan: la segunda reemplaza a la
+	 * primera y no suman.
 	 */
 	private static void ponerAtributos(ItemStack stack, TipoDeObjeto tipo, ObjetoConAfijos objeto) {
 		EquipmentSlotGroup grupo = EquipmentSlotGroup.MAINHAND;
@@ -162,11 +163,29 @@ public final class GeneradorDeBotin {
 		for (Map.Entry<AfijoDeBotin, Double> entrada : objeto.afijos().entrySet()) {
 			AfijoDeBotin afijo = entrada.getKey();
 			if (afijo.atributo() != null) {
-				AttributeModifier modificador = new AttributeModifier(MythicLoot.id(afijo.id() + "/" + grupo.getSerializedName()), entrada.getValue(), afijo.operacion());
-				modificadores = modificadores.withModifierAdded(afijo.atributo(), modificador, grupo);
+				modificadores = sumar(modificadores, afijo, entrada.getValue(), grupo);
 			}
 		}
 		stack.set(DataComponents.ATTRIBUTE_MODIFIERS, modificadores);
+	}
+
+	/**
+	 * Si el objeto ya trae un modificador del mismo atributo, operación y slots (la armadura del peto, el daño de la
+	 * espada), le suma el afijo: el tooltip muestra "Armadura: +4.5" y no dos líneas de armadura. Si no, agrega uno.
+	 */
+	private static ItemAttributeModifiers sumar(ItemAttributeModifiers modificadores, AfijoDeBotin afijo, double valor, EquipmentSlotGroup grupo) {
+		List<ItemAttributeModifiers.Entry> entradas = new ArrayList<>(modificadores.modifiers());
+		for (int i = 0; i < entradas.size(); i++) {
+			ItemAttributeModifiers.Entry entrada = entradas.get(i);
+			AttributeModifier existente = entrada.modifier();
+			if (entrada.attribute().equals(afijo.atributo()) && entrada.slot() == grupo && existente.operation() == afijo.operacion()) {
+				AttributeModifier sumado = new AttributeModifier(existente.id(), existente.amount() + valor, existente.operation());
+				entradas.set(i, new ItemAttributeModifiers.Entry(entrada.attribute(), sumado, entrada.slot(), entrada.display()));
+				return new ItemAttributeModifiers(entradas);
+			}
+		}
+		AttributeModifier modificador = new AttributeModifier(MythicLoot.id(afijo.id() + "/" + grupo.getSerializedName()), valor, afijo.operacion());
+		return modificadores.withModifierAdded(afijo.atributo(), modificador, grupo);
 	}
 
 	private static Item base(Configuracion config, int nivel, Rareza rareza, TipoDeObjeto tipo, RandomSource random) {

@@ -39,7 +39,7 @@ Entre las que ya pueden salir, se sortea por peso: en el nivel 100 sale una lege
 
 ### Afijos
 
-El nombre lleva el afijo principal: **"Espada de diamante del Vampiro"**. El tooltip muestra la rareza, el nivel y cada afijo: los que son atributos los muestra Minecraft solo ("Cuando está en la mano principal: +4,5 de daño de ataque").
+El nombre lleva el afijo principal: **"Espada de diamante del Vampiro"**. El tooltip muestra la rareza, el nivel y cada afijo: los que son atributos los muestra Minecraft solo. Si el objeto ya trae ese atributo, el afijo se le suma: un peto de hierro "de la Fortaleza" muestra una sola línea, "Armadura: +6.5", y no "+6" y "+0.5" por separado.
 
 | Afijo | Nombre | En | Qué hace | Al máximo (nivel 100, antes de la rareza) |
 |---|---|---|---|---|

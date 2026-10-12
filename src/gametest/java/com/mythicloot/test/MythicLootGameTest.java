@@ -69,14 +69,14 @@ public class MythicLootGameTest {
 				helper.assertValueEqual(objeto.afijos().size(), rareza.afijos(), que + ": un afijo por cada uno de la rareza");
 
 				ItemAttributeModifiers modificadores = stack.get(DataComponents.ATTRIBUTE_MODIFIERS);
+				ItemAttributeModifiers deVanilla = new ItemStack(stack.getItem()).getOrDefault(DataComponents.ATTRIBUTE_MODIFIERS, ItemAttributeModifiers.EMPTY);
 				for (Map.Entry<AfijoDeBotin, Double> entrada : objeto.afijos().entrySet()) {
 					AfijoDeBotin afijo = entrada.getKey();
 					helper.assertTrue(afijo.sirvePara(tipo), Component.literal(que + ": " + afijo + " sirve para el tipo"));
 					helper.assertTrue(entrada.getValue() > 0, Component.literal(que + ": " + afijo + " vale algo"));
 					if (afijo.atributo() != null) {
-						boolean esta = modificadores.modifiers().stream().anyMatch(m -> m.attribute().equals(afijo.atributo())
-								&& m.modifier().id().getPath().startsWith(afijo.id() + "/") && Math.abs(m.modifier().amount() - entrada.getValue()) < 1e-9);
-						helper.assertTrue(esta, Component.literal(que + ": " + afijo + " está en attribute_modifiers"));
+						// Puede ir sumado al modificador de vanilla o aparte: lo que importa es el total
+						assertCerca(helper, suma(modificadores, afijo) - suma(deVanilla, afijo), entrada.getValue(), que + ": " + afijo + " suma su valor en attribute_modifiers");
 					}
 				}
 				if (tipo == TipoDeObjeto.CUERPO_A_CUERPO) {
@@ -134,6 +134,18 @@ public class MythicLootGameTest {
 			zombie.discard();
 			helper.succeed();
 		});
+	}
+
+	/** "Peto de la Fortaleza" tiene que mostrar una sola línea de armadura, con la del peto y la del afijo sumadas. */
+	@GameTest
+	public void elAfijoSeSumaAlAtributoDelObjeto(GameTestHelper helper) {
+		ItemStack peto = conAfijo(new ItemStack(Items.IRON_CHESTPLATE), TipoDeObjeto.ARMADURA, AfijoDeBotin.REFORZADO, 0.5);
+		double deVanilla = suma(new ItemStack(Items.IRON_CHESTPLATE).get(DataComponents.ATTRIBUTE_MODIFIERS), AfijoDeBotin.REFORZADO);
+		List<ItemAttributeModifiers.Entry> armadura = peto.get(DataComponents.ATTRIBUTE_MODIFIERS).modifiers().stream()
+				.filter(m -> m.attribute().equals(Attributes.ARMOR)).toList();
+		helper.assertValueEqual(armadura.size(), 1, "Un solo modificador de armadura");
+		assertCerca(helper, armadura.getFirst().modifier().amount(), deVanilla + 0.5, "La del peto más la del afijo");
+		helper.succeed();
 	}
 
 	@GameTest
@@ -302,6 +314,13 @@ public class MythicLootGameTest {
 
 	private static ItemStack conAfijo(ItemStack stack, TipoDeObjeto tipo, AfijoDeBotin afijo, double valor) {
 		return GeneradorDeBotin.armar(stack, tipo, new ObjetoConAfijos(50, Rareza.MAGICA, Map.of(afijo, valor)), afijo);
+	}
+
+	/** Lo que suman los modificadores del atributo y la operación de ese afijo. */
+	private static double suma(ItemAttributeModifiers modificadores, AfijoDeBotin afijo) {
+		return modificadores.modifiers().stream()
+				.filter(m -> m.attribute().equals(afijo.atributo()) && m.modifier().operation() == afijo.operacion())
+				.mapToDouble(m -> m.modifier().amount()).sum();
 	}
 
 	private static Configuracion conChance(double chance) {

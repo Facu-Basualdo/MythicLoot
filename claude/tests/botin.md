@@ -10,8 +10,9 @@ Todo está en `MythicLootGameTest`.
 
 | Test | Qué verifica |
 |---|---|
-| `generarCadaTipoYRareza` | Para los 3 tipos × 4 rarezas en nivel 60: los datos en `custom_data`, un afijo por cada uno de la rareza, todos sirven para el tipo, cada atributo está en `attribute_modifiers` con su id y valor, el arma conserva el daño de vanilla, el nombre termina en un sufijo y el lore arranca con "Rareza: …" |
+| `generarCadaTipoYRareza` | Para los 3 tipos × 4 rarezas en nivel 60: los datos en `custom_data`, un afijo por cada uno de la rareza, todos sirven para el tipo, cada atributo suma su valor en `attribute_modifiers` (contra el ítem de vanilla), el arma conserva el daño de vanilla, el nombre termina en un sufijo y el lore arranca con "Rareza: …" |
 | `valoresYMaterialesSegunElNivel` | La fórmula de `valor` en los bordes (máximo, legendaria × 1,25, mínimo, nivel de más) · cobre en el nivel 5 · en el 90, épica de diamante y legendaria de netherita con brillo · en el 10 sólo mágica · un jefe nunca da menos que la mínima, aunque su nivel no la dé |
+| `elAfijoSeSumaAlAtributoDelObjeto` | Un peto de hierro con reforzado 0,5 tiene un solo modificador de armadura, con la del peto más 0,5 |
 | `dosPiezasDeArmaduraSuman` | Casco y botas "del Gigante" de 4 suman 8 de vida en un zombi, dos ticks después |
 | `vampiricoYArdienteAlPegar` | Una espada con vampírico 0,1 y ardiente cura 0,8 con un golpe de 8 y prende al gólem · una espada común no |
 | `certeroYArdienteEnLasFlechas` | Una flecha de un arco con certero 0,5 aparece con 1,5 × el daño base y prendida · llamar de nuevo a `alDisparar` no lo aplica dos veces · con un arco común, el daño de vanilla |

@@ -26,12 +26,14 @@ Una legendaria necesita 4 afijos distintos: **cada tipo tiene que tener al menos
 - **El sufijo es un sustantivo ("del Vampiro") y no un adjetivo:** con adjetivos habría que concordar con el objeto ("Espada Afilada", "Arco Afilado", "Botas Afiladas"), y el nombre base es traducible: el mod no sabe en qué idioma ni con qué género lo ve el cliente.
 - Los valores máximos están en `Configuracion.valoresMaximos`, por id. El fuego va en segundos; los porcentajes, como fracción.
 
-## Atributos: el id lleva el grupo de slots
+## Atributos: sumados al de vanilla, o con el grupo de slots en el id
 
-**El modificador se llama `mythicloot:<afijo>/<grupo>`** (`mythicloot:robusto/head`, `mythicloot:afilado/mainhand`). Vanilla aplica los `attribute_modifiers` de cada pieza equipada con su id, y un `AttributeInstance` guarda **un modificador por id**: si el casco y las botas usaran `mythicloot:robusto`, la segunda pieza reemplazaría a la primera y no sumarían. Es el mismo motivo por el que vanilla nombra la armadura `armor.helmet`, `armor.boots`…
+**Si el objeto ya trae un modificador del mismo atributo, operación y grupo de slots** (la armadura del peto, el daño de la espada, la dureza del diamante), `GeneradorDeBotin.sumar` le suma el valor del afijo y conserva el id de vanilla: con un modificador aparte el tooltip mostraba dos líneas ("Armadura: +4" y "Armadura: +0.5"). En el daño del arma eso además lo deja en la línea verde de vanilla, que ya incluye el daño base del jugador. El valor del afijo solo sigue en `custom_data`.
+
+**Si no, el modificador se llama `mythicloot:<afijo>/<grupo>`** (`mythicloot:robusto/head`, `mythicloot:afilado/mainhand`). Vanilla aplica los `attribute_modifiers` de cada pieza equipada con su id, y un `AttributeInstance` guarda **un modificador por id**: si el casco y las botas usaran `mythicloot:robusto`, la segunda pieza reemplazaría a la primera y no sumarían. Es el mismo motivo por el que vanilla nombra la armadura `armor.helmet`, `armor.boots`…
 
 - El grupo de la armadura sale de `EQUIPPABLE.slot()` con `EquipmentSlotGroup.bySlot`; las armas y los arcos usan `MAINHAND`.
-- Las armas y armaduras de vanilla ya traen `attribute_modifiers` (el daño de la espada, la armadura del peto): se suman con `withModifierAdded`, nunca se reemplazan (ver [Botín](botin.md#qué-se-guarda-en-el-objeto)).
+- Las armas y armaduras de vanilla ya traen `attribute_modifiers` (el daño de la espada, la armadura del peto): se suman (al modificador existente o con `withModifierAdded`), nunca se reemplazan (ver [Botín](botin.md#qué-se-guarda-en-el-objeto)).
 - Al equipar, vanilla aplica los modificadores en el tick siguiente (`collectEquipmentChanges`): el test espera dos ticks.
 
 ## Los que aplica el mod (`Efectos`)

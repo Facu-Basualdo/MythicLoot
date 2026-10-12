@@ -62,7 +62,7 @@ Todo en **componentes de vanilla**: un cliente sin el mod lo ve entero, y el obj
 | Componente | Qué lleva |
 |---|---|
 | `custom_data` | Bajo la clave `mythicloot`: `{nivel, rareza, afijos: {id: valor}}` (`ObjetoConAfijos`). `CustomData.update` no pisa las claves de otros mods |
-| `attribute_modifiers` | **Los de vanilla más los de los afijos** (`withModifierAdded` sobre el que ya trae el ítem): si se pusiera uno nuevo, la espada perdería su daño y el peto su armadura |
+| `attribute_modifiers` | **Los de vanilla más los de los afijos** (sumados al modificador de vanilla del mismo atributo, o agregados con `withModifierAdded`): si se pusiera uno nuevo, la espada perdería su daño y el peto su armadura |
 | `item_name` | El nombre traducible de vanilla + el sufijo, del color de la rareza. En `item_name` y no `custom_name`: no sale en cursiva ni como "renombrado", y un yunque igual lo puede renombrar |
 | `lore` | "Rareza: épica", "Nivel 57" y una línea por cada afijo que no es atributo (los atributos los muestra vanilla) |
 | `enchantment_glint_override` | Sólo en las legendarias |
