@@ -18,6 +18,7 @@ Todo está en `MythicLootGameTest`.
 | `certeroYArdienteEnLasFlechas` | Una flecha de un arco con certero 0,5 aparece con 1,5 × el daño base y prendida · llamar de nuevo a `alDisparar` no lo aplica dos veces · con un arco común, el daño de vanilla |
 | `sorteoConYSinBloodmoon` | Con Bloodmoon: el nivel del attachment, sin attachment no suelta ni con chance 1, chance 0 no suelta, el afijo lo hace campeón, el jefe suelta épica o mejor aunque la chance sea 0 · sin Bloodmoon: el nivel de la distancia, y el attachment de jefe no cuenta |
 | `alMorirSueltaSiLoMatoUnJugador` | Con chance 1: un zombi muerto por un jugador suelta un objeto con afijos; muerto con `genericKill`, no; un gólem (no es `Enemy`) muerto por un jugador, no |
+| `juntarEnElYunque` | Con un `AnvilMenu` de verdad: dos espadas sanas, "del Filo" y "de la Furia", dan una rara con los dos afijos, sin el filo sumado dos veces, con el nombre de la izquierda y costo `costoPorAfijoUnido` · gastada, 2 de reparar más el afijo · un afijo repetido peor no da resultado; uno mejor se queda el valor alto sin subir la rareza · un casco legendario de 4 no gana un quinto, pero sí mejora uno, con la armadura del casco bien sumada · espada + hacha no se juntan |
 | `archivoDeConfiguracion` | Sin archivo, `POR_DEFECTO` y el archivo con rarezas y afijos · un archivo parcial se completa también dentro de los mapas y de una rareza · `chanceMaxima` 2, una `rarezaDeJefe` que no existe y un valor máximo 0 se rechazan sin pisar el archivo |
 
 ## Cosas que no son obvias
@@ -28,9 +29,11 @@ Todo está en `MythicLootGameTest`.
 - **Los afijos exactos se arman con `GeneradorDeBotin.armar`** y un `ObjetoConAfijos` hecho a mano: con `generar` saldrían al azar.
 - **Los jugadores de prueba no tickean** (su conexión es un `EmbeddedChannel`), y vanilla aplica los atributos del equipo en el tick: la armadura se prueba con un zombi, que sí tickea, y `runAfterDelay(2)`.
 - **Matá con `playerAttack(jugador)`** para que `getLastHurtByPlayer()` lo tenga. El jugador sale de `entrar()` (supervivencia), no de `makeMockServerPlayerInLevel`, que fuerza creativo.
+- **El yunque se prueba con `new AnvilMenu(0, inventario, ContainerLevelAccess.NULL)`:** cada `getSlot(i).set(...)` dispara `createResult`, como cuando el jugador pone los objetos. Copiá los stacks antes de ponerlos, que el menú se queda con ellos.
 - **Contá y borrá los ítems:** todos los mobs mueren en el mismo lugar, y el zombi suelta también su carne podrida. `contar` sólo cuenta los que tienen `ObjetoConAfijos`.
 
 ## Ver también
 
 - [Botín: generar y soltar](../mod/botin.md)
 - [Afijos](../mod/afijos.md)
+- [Juntar en el yunque](../mod/yunque.md)

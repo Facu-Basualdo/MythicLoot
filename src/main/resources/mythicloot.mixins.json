@@ -3,7 +3,8 @@
 	"package": "com.mythicloot.mixin",
 	"compatibilityLevel": "JAVA_25",
 	"mixins": [
-		"FlechaAccessor"
+		"FlechaAccessor",
+		"YunqueMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

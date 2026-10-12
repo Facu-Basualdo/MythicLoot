@@ -37,7 +37,7 @@ El objeto cae con `spawnAtLocation`. **Épicas y legendarias quedan brillando** 
 
 ## Generar (`GeneradorDeBotin`)
 
-`generar(config, nivel, rareza, tipo, random)` → `armar(stack, tipo, ObjetoConAfijos, principal)`.
+`generar(config, nivel, rareza, tipo, random)` → `armar(stack, ObjetoConAfijos, principal)`. Los atributos de armadura van en el grupo del slot de su `equippable`; todo lo demás, en la mano principal. `rearmar` cambia los afijos de un objeto que ya los tenía (ver [yunque](yunque.md)).
 
 **Rareza** (`elegirRareza`): por peso entre las que ya salen con ese nivel (`rarezas.<id>.nivelMinimo`); con una mínima, sólo las iguales o mejores. **Si ninguna tan buena sale todavía, da la mínima igual**: el jefe la asegura. La mágica tiene que salir desde el nivel 1 (`validar`), o un mob de nivel bajo no tendría qué soltar.
 
@@ -77,5 +77,6 @@ Todo en **componentes de vanilla**: un cliente sin el mod lo ve entero, y el obj
 ## Ver también
 
 - [Afijos](afijos.md)
+- [Juntar en el yunque](yunque.md)
 - [Tests: botín](../tests/botin.md)
 - [Probar en el juego](../general/probar-en-el-juego.md)

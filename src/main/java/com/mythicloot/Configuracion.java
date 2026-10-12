@@ -13,6 +13,8 @@ import java.util.Map;
  * @param rarezaDeJefe la rareza mínima del objeto que suelta siempre un jefe de zona
  * @param nivelesPorMaterial cada cuántos niveles mejora el material (cobre, hierro, diamante…)
  * @param valoresMaximos lo que vale cada afijo en el nivel máximo, antes del azar y la rareza
+ * @param costoPorAfijoUnido cuántos niveles de experiencia suma al yunque cada afijo que gana o mejora un objeto al
+ *        juntarlo con otro
  */
 public record Configuracion(
 		int nivelMaximo,
@@ -29,7 +31,8 @@ public record Configuracion(
 		Map<String, Double> pesosDeTipo,
 		int nivelesPorMaterial,
 		boolean netheritaSoloLegendaria,
-		Map<String, Double> valoresMaximos) {
+		Map<String, Double> valoresMaximos,
+		int costoPorAfijoUnido) {
 
 	/*
 	 * Pensados junto con Bloodmoon & Bosses y Hero's Forge, que llegan al nivel 100. Con 2 % + 0,08 % por nivel, un
@@ -59,7 +62,9 @@ public record Configuracion(
 					TipoDeObjeto.ARMADURA.getSerializedName(), 40.0), TipoDeObjeto.values()),
 			20,
 			true,
-			valoresPorDefecto());
+			valoresPorDefecto(),
+			// Llevar una mágica a legendaria juntando objetos cuesta 12 niveles, más lo que cobra vanilla por reparar
+			4);
 
 	private static Map<String, Double> valoresPorDefecto() {
 		Map<String, Double> valores = new LinkedHashMap<>();
@@ -132,6 +137,7 @@ public record Configuracion(
 			Double valor = valoresMaximos.get(afijo.id());
 			exigir(valor != null && valor > 0, "el valor máximo de " + afijo.id() + " falta o no es mayor que 0");
 		}
+		exigir(costoPorAfijoUnido >= 0, "costoPorAfijoUnido no puede ser negativo");
 	}
 
 	private static void exigir(boolean condicion, String mensaje) {

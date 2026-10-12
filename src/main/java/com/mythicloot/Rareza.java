@@ -56,6 +56,16 @@ public enum Rareza implements StringRepresentable {
 		return bonificacion;
 	}
 
+	/** La primera que trae esa cantidad de afijos; con más de los que trae la mejor, la mejor. */
+	public static Rareza conAfijos(int cantidad) {
+		for (Rareza rareza : values()) {
+			if (rareza.afijos >= cantidad) {
+				return rareza;
+			}
+		}
+		return LEGENDARIA;
+	}
+
 	public static @Nullable Rareza porId(String id) {
 		for (Rareza rareza : values()) {
 			if (rareza.id.equals(id)) {

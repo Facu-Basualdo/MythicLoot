@@ -111,24 +111,42 @@ public final class GeneradorDeBotin {
 			}
 		}
 
-		return armar(stack, tipo, new ObjetoConAfijos(nivelDelObjeto, rareza, afijos), principal);
+		return armar(stack, new ObjetoConAfijos(nivelDelObjeto, rareza, afijos), principal);
 	}
 
 	/**
 	 * Le pone a un objeto base los afijos ya elegidos: atributos, datos, nombre y lore. {@code principal} es el que da
 	 * el nombre ("del Vampiro"); null deja el nombre de vanilla.
 	 */
-	public static ItemStack armar(ItemStack stack, TipoDeObjeto tipo, ObjetoConAfijos objeto, @Nullable AfijoDeBotin principal) {
-		Rareza rareza = objeto.rareza();
-		ponerAtributos(stack, tipo, objeto);
-		objeto.guardarEn(stack);
-
+	public static ItemStack armar(ItemStack stack, ObjetoConAfijos objeto, @Nullable AfijoDeBotin principal) {
 		// En ITEM_NAME y no en CUSTOM_NAME: no sale en cursiva ni como "renombrado", y un yunque lo puede renombrar
 		MutableComponent nombre = Component.empty().append(stack.getHoverName());
 		if (principal != null) {
 			nombre.append(" " + principal.sufijo());
 		}
-		stack.set(DataComponents.ITEM_NAME, nombre.withStyle(rareza.color()));
+		stack.set(DataComponents.ITEM_NAME, nombre.withStyle(objeto.rareza().color()));
+		ponerAfijos(stack, objeto);
+		return stack;
+	}
+
+	/**
+	 * Le cambia los afijos a un objeto que ya tenía (el resultado del yunque): los atributos vuelven a los del objeto
+	 * de vanilla antes de sumar los nuevos, para no sumar dos veces los viejos. El nombre se queda, con el color de la
+	 * rareza nueva.
+	 */
+	public static void rearmar(ItemStack stack, ObjetoConAfijos objeto) {
+		stack.set(DataComponents.ATTRIBUTE_MODIFIERS, stack.getPrototype().getOrDefault(DataComponents.ATTRIBUTE_MODIFIERS, ItemAttributeModifiers.EMPTY));
+		Component nombre = stack.get(DataComponents.ITEM_NAME);
+		if (nombre != null) {
+			stack.set(DataComponents.ITEM_NAME, nombre.copy().withStyle(objeto.rareza().color()));
+		}
+		ponerAfijos(stack, objeto);
+	}
+
+	private static void ponerAfijos(ItemStack stack, ObjetoConAfijos objeto) {
+		Rareza rareza = objeto.rareza();
+		ponerAtributos(stack, objeto);
+		objeto.guardarEn(stack);
 
 		List<Component> lore = new ArrayList<>();
 		lore.add(Texto.lore("Rareza: " + rareza.nombre(), rareza.color()));
@@ -144,7 +162,6 @@ public final class GeneradorDeBotin {
 		if (rareza == Rareza.LEGENDARIA) {
 			stack.set(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true);
 		}
-		return stack;
 	}
 
 	/**
@@ -153,10 +170,10 @@ public final class GeneradorDeBotin {
 	 * de slots en el id porque dos piezas con el mismo id en el mismo atributo se pisan: la segunda reemplaza a la
 	 * primera y no suman.
 	 */
-	private static void ponerAtributos(ItemStack stack, TipoDeObjeto tipo, ObjetoConAfijos objeto) {
+	private static void ponerAtributos(ItemStack stack, ObjetoConAfijos objeto) {
 		EquipmentSlotGroup grupo = EquipmentSlotGroup.MAINHAND;
 		Equippable equipable = stack.get(DataComponents.EQUIPPABLE);
-		if (tipo == TipoDeObjeto.ARMADURA && equipable != null) {
+		if (equipable != null && equipable.slot().isArmor()) {
 			grupo = EquipmentSlotGroup.bySlot(equipable.slot());
 		}
 		ItemAttributeModifiers modificadores = stack.getOrDefault(DataComponents.ATTRIBUTE_MODIFIERS, ItemAttributeModifiers.EMPTY);

@@ -44,6 +44,8 @@ import net.minecraft.world.entity.animal.golem.IronGolem;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.zombie.Zombie;
 import net.minecraft.world.entity.projectile.arrow.Arrow;
+import net.minecraft.world.inventory.AnvilMenu;
+import net.minecraft.world.inventory.ContainerLevelAccess;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.ItemAttributeModifiers;
@@ -126,8 +128,8 @@ public class MythicLootGameTest {
 	public void dosPiezasDeArmaduraSuman(GameTestHelper helper) {
 		Zombie zombie = helper.spawn(EntityTypes.ZOMBIE, DENTRO);
 		double vida = zombie.getAttributeValue(Attributes.MAX_HEALTH);
-		zombie.setItemSlot(EquipmentSlot.HEAD, conAfijo(new ItemStack(Items.IRON_HELMET), TipoDeObjeto.ARMADURA, AfijoDeBotin.ROBUSTO, 4));
-		zombie.setItemSlot(EquipmentSlot.FEET, conAfijo(new ItemStack(Items.IRON_BOOTS), TipoDeObjeto.ARMADURA, AfijoDeBotin.ROBUSTO, 4));
+		zombie.setItemSlot(EquipmentSlot.HEAD, conAfijo(new ItemStack(Items.IRON_HELMET), AfijoDeBotin.ROBUSTO, 4));
+		zombie.setItemSlot(EquipmentSlot.FEET, conAfijo(new ItemStack(Items.IRON_BOOTS), AfijoDeBotin.ROBUSTO, 4));
 		// La vida de la armadura la aplica el tick del mob (collectEquipmentChanges)
 		helper.runAfterDelay(2, () -> {
 			assertCerca(helper, zombie.getAttributeValue(Attributes.MAX_HEALTH), vida + 8, "Casco y botas \"del Gigante\" suman 4 + 4");
@@ -139,7 +141,7 @@ public class MythicLootGameTest {
 	/** "Peto de la Fortaleza" tiene que mostrar una sola línea de armadura, con la del peto y la del afijo sumadas. */
 	@GameTest
 	public void elAfijoSeSumaAlAtributoDelObjeto(GameTestHelper helper) {
-		ItemStack peto = conAfijo(new ItemStack(Items.IRON_CHESTPLATE), TipoDeObjeto.ARMADURA, AfijoDeBotin.REFORZADO, 0.5);
+		ItemStack peto = conAfijo(new ItemStack(Items.IRON_CHESTPLATE), AfijoDeBotin.REFORZADO, 0.5);
 		double deVanilla = suma(new ItemStack(Items.IRON_CHESTPLATE).get(DataComponents.ATTRIBUTE_MODIFIERS), AfijoDeBotin.REFORZADO);
 		List<ItemAttributeModifiers.Entry> armadura = peto.get(DataComponents.ATTRIBUTE_MODIFIERS).modifiers().stream()
 				.filter(m -> m.attribute().equals(Attributes.ARMOR)).toList();
@@ -156,7 +158,7 @@ public class MythicLootGameTest {
 		Map<AfijoDeBotin, Double> afijos = new EnumMap<>(AfijoDeBotin.class);
 		afijos.put(AfijoDeBotin.VAMPIRICO, 0.1);
 		afijos.put(AfijoDeBotin.ARDIENTE, 3.0);
-		GeneradorDeBotin.armar(espada, TipoDeObjeto.CUERPO_A_CUERPO, new ObjetoConAfijos(50, Rareza.RARA, afijos), AfijoDeBotin.VAMPIRICO);
+		GeneradorDeBotin.armar(espada, new ObjetoConAfijos(50, Rareza.RARA, afijos), AfijoDeBotin.VAMPIRICO);
 		jugador.setItemSlot(EquipmentSlot.MAINHAND, espada);
 		jugador.setHealth(10);
 
@@ -185,7 +187,7 @@ public class MythicLootGameTest {
 		Map<AfijoDeBotin, Double> afijos = new EnumMap<>(AfijoDeBotin.class);
 		afijos.put(AfijoDeBotin.CERTERO, 0.5);
 		afijos.put(AfijoDeBotin.ARDIENTE, 2.0);
-		GeneradorDeBotin.armar(arco, TipoDeObjeto.A_DISTANCIA, new ObjetoConAfijos(50, Rareza.RARA, afijos), AfijoDeBotin.CERTERO);
+		GeneradorDeBotin.armar(arco, new ObjetoConAfijos(50, Rareza.RARA, afijos), AfijoDeBotin.CERTERO);
 
 		Arrow flecha = new Arrow(level, jugador, new ItemStack(Items.ARROW), arco);
 		double base = ((FlechaAccessor) flecha).mythicloot$danioBase();
@@ -205,6 +207,68 @@ public class MythicLootGameTest {
 		comun.discard();
 		salir(helper, jugador);
 		helper.succeed();
+	}
+
+	/** Vanilla deja sólo los afijos del de la izquierda: el mixin del yunque suma los del otro. */
+	@GameTest
+	public void juntarEnElYunque(GameTestHelper helper) {
+		ServerPlayer jugador = entrar(helper, "herrero");
+		int costo = Configuracion.POR_DEFECTO.costoPorAfijoUnido();
+		double danioDeVanilla = suma(new ItemStack(Items.COPPER_SWORD).get(DataComponents.ATTRIBUTE_MODIFIERS), AfijoDeBotin.AFILADO);
+
+		ItemStack filo = conAfijo(new ItemStack(Items.COPPER_SWORD), AfijoDeBotin.AFILADO, 1.5);
+		ItemStack furia = conAfijo(new ItemStack(Items.COPPER_SWORD), AfijoDeBotin.FURIOSO, 0.05);
+		AnvilMenu yunque = yunque(jugador, filo, furia);
+		ItemStack resultado = yunque.getSlot(AnvilMenu.RESULT_SLOT).getItem();
+		ObjetoConAfijos unido = ObjetoConAfijos.de(resultado);
+		helper.assertTrue(unido != null, Component.literal("Dos espadas sin daño ni encantamientos igual dan resultado"));
+		helper.assertValueEqual(unido.afijos(), Map.of(AfijoDeBotin.AFILADO, 1.5, AfijoDeBotin.FURIOSO, 0.05), "Tiene los afijos de las dos");
+		helper.assertValueEqual(unido.rareza(), Rareza.RARA, "Con dos afijos pasa a rara");
+		helper.assertValueEqual(yunque.getCost(), costo, "Cobra un afijo ganado");
+		ItemAttributeModifiers modificadores = resultado.get(DataComponents.ATTRIBUTE_MODIFIERS);
+		assertCerca(helper, suma(modificadores, AfijoDeBotin.AFILADO), danioDeVanilla + 1.5, "El filo no se suma dos veces");
+		assertCerca(helper, suma(modificadores, AfijoDeBotin.FURIOSO), 0.05, "La furia está");
+		helper.assertTrue(resultado.getHoverName().getString().endsWith(AfijoDeBotin.AFILADO.sufijo()), Component.literal("Se queda el nombre del de la izquierda"));
+		helper.assertValueEqual(resultado.get(DataComponents.LORE).lines().getFirst().getString(), "Rareza: rara", "El lore dice la rareza nueva");
+
+		ItemStack gastada = conAfijo(new ItemStack(Items.COPPER_SWORD), AfijoDeBotin.AFILADO, 1.5);
+		gastada.setDamageValue(100);
+		helper.assertValueEqual(yunque(jugador, gastada, furia).getCost(), 2 + costo, "Reparar cobra lo de vanilla más el afijo");
+
+		helper.assertTrue(yunque(jugador, filo, conAfijo(new ItemStack(Items.COPPER_SWORD), AfijoDeBotin.AFILADO, 1.0)).getSlot(AnvilMenu.RESULT_SLOT).getItem().isEmpty(),
+				Component.literal("Si no gana nada, como en vanilla: sin resultado"));
+		ItemStack mejorado = yunque(jugador, filo, conAfijo(new ItemStack(Items.COPPER_SWORD), AfijoDeBotin.AFILADO, 2.0)).getSlot(AnvilMenu.RESULT_SLOT).getItem();
+		helper.assertValueEqual(ObjetoConAfijos.de(mejorado).valor(AfijoDeBotin.AFILADO), 2.0, "Un afijo repetido se queda con el valor más alto");
+		helper.assertValueEqual(ObjetoConAfijos.de(mejorado).rareza(), Rareza.MAGICA, "Y no sube la rareza");
+
+		Map<AfijoDeBotin, Double> cuatro = new EnumMap<>(AfijoDeBotin.class);
+		cuatro.put(AfijoDeBotin.ROBUSTO, 2.0);
+		cuatro.put(AfijoDeBotin.REFORZADO, 1.0);
+		cuatro.put(AfijoDeBotin.TENAZ, 1.0);
+		cuatro.put(AfijoDeBotin.FIRME, 0.05);
+		ItemStack legendario = GeneradorDeBotin.armar(new ItemStack(Items.IRON_HELMET), new ObjetoConAfijos(80, Rareza.LEGENDARIA, cuatro), AfijoDeBotin.ROBUSTO);
+		ItemStack casco = yunque(jugador, legendario, conAfijo(new ItemStack(Items.IRON_HELMET), AfijoDeBotin.AFORTUNADO, 1.0)).getSlot(AnvilMenu.RESULT_SLOT).getItem();
+		helper.assertTrue(casco.isEmpty(), Component.literal("Con cuatro afijos no entra otro, y sin nada que ganar no hay resultado"));
+		ItemStack conMagico = conAfijo(new ItemStack(Items.IRON_HELMET), AfijoDeBotin.REFORZADO, 1.5);
+		ItemStack mejorCasco = yunque(jugador, legendario, conMagico).getSlot(AnvilMenu.RESULT_SLOT).getItem();
+		ObjetoConAfijos objetoCasco = ObjetoConAfijos.de(mejorCasco);
+		helper.assertValueEqual(objetoCasco.afijos().size(), 4, "Sigue con cuatro");
+		helper.assertValueEqual(objetoCasco.nivel(), 80, "El nivel más alto");
+		double armaduraDeVanilla = suma(new ItemStack(Items.IRON_HELMET).get(DataComponents.ATTRIBUTE_MODIFIERS), AfijoDeBotin.REFORZADO);
+		assertCerca(helper, suma(mejorCasco.get(DataComponents.ATTRIBUTE_MODIFIERS), AfijoDeBotin.REFORZADO), armaduraDeVanilla + 1.5, "La armadura del casco más la del afijo mejorado");
+
+		helper.assertTrue(yunque(jugador, filo, conAfijo(new ItemStack(Items.COPPER_AXE), AfijoDeBotin.FURIOSO, 0.05)).getSlot(AnvilMenu.RESULT_SLOT).getItem().isEmpty(),
+				Component.literal("Una espada y un hacha no se juntan, como en vanilla"));
+		salir(helper, jugador);
+		helper.succeed();
+	}
+
+	private static AnvilMenu yunque(ServerPlayer jugador, ItemStack izquierda, ItemStack derecha) {
+		AnvilMenu yunque = new AnvilMenu(0, jugador.getInventory(), ContainerLevelAccess.NULL);
+		// Cada set llama a createResult, como cuando el jugador pone los objetos
+		yunque.getSlot(AnvilMenu.INPUT_SLOT).set(izquierda.copy());
+		yunque.getSlot(AnvilMenu.ADDITIONAL_SLOT).set(derecha.copy());
+		return yunque;
 	}
 
 	/** Cambia el modo Bloodmoon, que es global: todo pasa adentro del método y se restaura en el finally. */
@@ -312,8 +376,8 @@ public class MythicLootGameTest {
 		helper.succeed();
 	}
 
-	private static ItemStack conAfijo(ItemStack stack, TipoDeObjeto tipo, AfijoDeBotin afijo, double valor) {
-		return GeneradorDeBotin.armar(stack, tipo, new ObjetoConAfijos(50, Rareza.MAGICA, Map.of(afijo, valor)), afijo);
+	private static ItemStack conAfijo(ItemStack stack, AfijoDeBotin afijo, double valor) {
+		return GeneradorDeBotin.armar(stack, new ObjetoConAfijos(50, Rareza.MAGICA, Map.of(afijo, valor)), afijo);
 	}
 
 	/** Lo que suman los modificadores del atributo y la operación de ese afijo. */
@@ -326,7 +390,8 @@ public class MythicLootGameTest {
 	private static Configuracion conChance(double chance) {
 		Configuracion c = Configuracion.POR_DEFECTO;
 		return new Configuracion(c.nivelMaximo(), c.bloquesPorNivel(), c.extraNether(), c.extraEnd(), chance, 0, chance, c.multiplicadorCampeon(),
-				c.botinDeJefe(), c.rarezaDeJefe(), c.rarezas(), c.pesosDeTipo(), c.nivelesPorMaterial(), c.netheritaSoloLegendaria(), c.valoresMaximos());
+				c.botinDeJefe(), c.rarezaDeJefe(), c.rarezas(), c.pesosDeTipo(), c.nivelesPorMaterial(), c.netheritaSoloLegendaria(), c.valoresMaximos(),
+				c.costoPorAfijoUnido());
 	}
 
 	/** Cuenta y borra los objetos con afijos que soltó: todos los mobs del test mueren en el mismo lugar. */

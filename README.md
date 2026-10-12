@@ -36,6 +36,7 @@ Entre las que ya pueden salir, se sortea por peso: en el nivel 100 sale una lege
 - **Cuerpo a cuerpo** (espada o hacha), **a distancia** (arco o ballesta) o **armadura** (casco, peto, pantalones o botas).
 - **El material depende del nivel:** cobre hasta el 19, hierro (cadena en armadura) hasta el 39, hierro hasta el 59, diamante desde el 60. **Netherita sólo las legendarias de nivel 80 o más.**
 - No salen encantados: se encantan en la mesa como cualquier otro. Se pueden renombrar y reparar en el yunque sin perder los afijos.
+- **Se pueden juntar en el yunque** (ver abajo).
 
 ### Afijos
 
@@ -60,6 +61,16 @@ El nombre lleva el afijo principal: **"Espada de diamante del Vampiro"**. El too
 - **Las piezas de armadura se suman:** cuatro piezas "del Gigante" dan su vida juntas.
 - El robo de vida no cura con el golpe que mata (como el de Hero's Forge).
 - Certero y el daño a distancia de Hero's Forge se suman.
+
+### Juntar en el yunque
+
+Dos objetos iguales con afijos (dos espadas de cobre, dos cascos de hierro…) se juntan en el yunque como en vanilla, y **el resultado se queda con los afijos de los dos**:
+
+- "Espada de cobre del Filo" + "Espada de cobre de la Furia" = una espada **rara** con daño y velocidad de ataque. Se queda con el nombre del de la izquierda.
+- **La rareza sube según cuántos afijos tenga:** 2 rara, 3 épica, 4 legendaria. Más de 4 no entran: se quedan los del de la izquierda.
+- **Si los dos tienen el mismo afijo, queda el valor más alto** (no se suman).
+- El nivel es el más alto de los dos. La durabilidad y los encantamientos se juntan como siempre.
+- **Cada afijo que gana o mejora cuesta 4 niveles**, además de lo que cobre vanilla por reparar o encantar. Si no gana nada, es un yunque común.
 
 ## Comandos (op)
 
@@ -87,6 +98,7 @@ En el primer arranque se crea **`config/mythicloot.json`** con los valores por d
 | `pesosDeTipo` | 40, 20, 40 | Cuánto sale cada tipo: `cuerpo_a_cuerpo`, `a_distancia`, `armadura` |
 | `nivelesPorMaterial` | 20 | Cada cuántos niveles mejora el material |
 | `netheritaSoloLegendaria` | `true` | Si la netherita sólo sale en legendarias |
+| `costoPorAfijoUnido` | 4 | Los niveles que cobra el yunque por cada afijo que gana o mejora un objeto |
 | `valoresMaximos` | ver la tabla de afijos | Lo que vale cada afijo en el nivel máximo: los porcentajes como fracción (`0.08` = 8 %), el fuego en segundos |
 
 ## Funciona con

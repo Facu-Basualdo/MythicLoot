@@ -24,7 +24,7 @@ El mismo tema en distintas áreas usa el mismo nombre de archivo (`claude/mod/bo
 
 | Área | Carpeta | Stack | Índice |
 |---|---|---|---|
-| Mod | `src/main/` | Java 25 · Fabric API (eventos de entidades y de daño, attachments, comandos) · un accessor mixin · nombres oficiales de Mojang | [claude/mod/INDICE.md](claude/mod/INDICE.md) |
+| Mod | `src/main/` | Java 25 · Fabric API (eventos de entidades y de daño, attachments, comandos) · un accessor mixin y uno del yunque (MixinExtras) · nombres oficiales de Mojang | [claude/mod/INDICE.md](claude/mod/INDICE.md) |
 | Tests | `src/gametest/` | Fabric GameTest API · servidor sin ventana | [claude/tests/INDICE.md](claude/tests/INDICE.md) |
 
 ## Notas transversales
@@ -41,6 +41,7 @@ El mismo tema en distintas áreas usa el mismo nombre de archivo (`claude/mod/bo
 |---|---|---|
 | Generar objetos (rareza, material por nivel, afijos, nombre y lore) y cuándo se sueltan (chance, jefes, campeones, Bloodmoon o distancia) | [botin](claude/mod/botin.md) | [botin](claude/tests/botin.md) |
 | Afijos: atributos de vanilla y los que aplica el mod (vampírico, ardiente, certero) | [afijos](claude/mod/afijos.md) | [botin](claude/tests/botin.md) |
+| Juntar dos objetos en el yunque: suma los afijos, sube la rareza, cobra por afijo ganado | [yunque](claude/mod/yunque.md) | [botin](claude/tests/botin.md) |
 
 ## Reglas de workflow
 
