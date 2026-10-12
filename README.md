@@ -99,6 +99,7 @@ En el primer arranque se crea **`config/mythicloot.json`** con los valores por d
 | `nivelesPorMaterial` | 20 | Cada cuántos niveles mejora el material |
 | `netheritaSoloLegendaria` | `true` | Si la netherita sólo sale en legendarias |
 | `costoPorAfijoUnido` | 4 | Los niveles que cobra el yunque por cada afijo que gana o mejora un objeto |
+| `idioma` | `"en_us"` | `en_us` o `es_ar`: el de los nombres y el lore de los objetos que se generan, para quien no tiene el mod en el cliente. Con el mod instalado en el cliente, cada uno los ve en su idioma. Los mensajes del chat salen siempre en el idioma de cada jugador |
 | `valoresMaximos` | ver la tabla de afijos | Lo que vale cada afijo en el nivel máximo: los porcentajes como fracción (`0.08` = 8 %), el fuego en segundos |
 
 ## Funciona con

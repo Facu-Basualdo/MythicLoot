@@ -48,12 +48,12 @@ public final class ComandoBotin {
 
 		Rareza rareza = idRareza == null ? GeneradorDeBotin.elegirRareza(config, nivel, random) : Rareza.porId(idRareza);
 		if (rareza == null) {
-			fuente.sendFailure(Component.literal("No existe la rareza " + idRareza + ". Opciones: " + String.join(", ", ids(Rareza.values()))));
+			fuente.sendFailure(Idioma.tr(fuente, "mythicloot.comando.rareza_desconocida", idRareza, String.join(", ", ids(Rareza.values()))));
 			return 0;
 		}
 		TipoDeObjeto tipo = idTipo == null ? GeneradorDeBotin.elegirTipo(config, random) : TipoDeObjeto.porId(idTipo);
 		if (tipo == null) {
-			fuente.sendFailure(Component.literal("No existe el tipo " + idTipo + ". Opciones: " + String.join(", ", ids(TipoDeObjeto.values()))));
+			fuente.sendFailure(Idioma.tr(fuente, "mythicloot.comando.tipo_desconocido", idTipo, String.join(", ", ids(TipoDeObjeto.values()))));
 			return 0;
 		}
 
@@ -62,17 +62,17 @@ public final class ComandoBotin {
 		if (!jugador.getInventory().add(objeto)) {
 			jugador.spawnAtLocation(jugador.level(), objeto);
 		}
-		fuente.sendSuccess(() -> Component.literal("Generado: ").append(nombre), false);
+		fuente.sendSuccess(() -> Idioma.tr(fuente, "mythicloot.comando.generado", nombre), false);
 		return 1;
 	}
 
 	private static int recargar(CommandContext<CommandSourceStack> ctx) {
 		String error = MythicLoot.cargarConfiguracion();
 		if (error != null) {
-			ctx.getSource().sendFailure(Component.literal("No se pudo recargar config/mythicloot.json, sigue la anterior: " + error));
+			ctx.getSource().sendFailure(Idioma.tr(ctx.getSource(), "mythicloot.comando.recarga_fallida", error));
 			return 0;
 		}
-		ctx.getSource().sendSuccess(() -> Component.literal("Config recargada"), true);
+		ctx.getSource().sendSuccess(() -> Idioma.tr(ctx.getSource(), "mythicloot.comando.recargada"), true);
 		return 1;
 	}
 

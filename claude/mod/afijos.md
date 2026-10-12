@@ -65,3 +65,4 @@ Una legendaria necesita 4 afijos distintos: **cada tipo tiene que tener al menos
 
 - [Botín: generar y soltar](botin.md)
 - [Tests: botín](../tests/botin.md)
+- [Idioma](idioma.md): los sufijos y las descripciones están en los archivos de idioma.

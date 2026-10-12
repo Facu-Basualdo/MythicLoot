@@ -5,8 +5,10 @@ import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.EnumMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import com.mojang.authlib.GameProfile;
@@ -18,6 +20,7 @@ import com.mythicloot.MythicLoot;
 import com.mythicloot.Caida;
 import com.mythicloot.Configuracion;
 import com.mythicloot.GeneradorDeBotin;
+import com.mythicloot.Idioma;
 import com.mythicloot.NivelDelMob;
 import com.mythicloot.ObjetoConAfijos;
 import com.mythicloot.Rareza;
@@ -31,6 +34,7 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.Connection;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.network.protocol.PacketFlow;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -54,6 +58,33 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
 public class MythicLootGameTest {
+	/** Sólo lee los archivos de idioma: no toca el mundo. */
+	@GameTest
+	public void textosEnLosDosIdiomas(GameTestHelper helper) {
+		Set<String> ingles = Idioma.claves(Idioma.INGLES);
+		Set<String> espanol = Idioma.claves(Idioma.ESPANOL);
+		Set<String> soloIngles = new HashSet<>(ingles);
+		soloIngles.removeAll(espanol);
+		Set<String> soloEspanol = new HashSet<>(espanol);
+		soloEspanol.removeAll(ingles);
+		helper.assertTrue(ingles.size() > 20, Component.literal("Se leyó el archivo en inglés (" + ingles.size() + " claves)"));
+		helper.assertTrue(soloIngles.isEmpty() && soloEspanol.isEmpty(),
+				Component.literal("Los dos idiomas tienen las mismas claves (sólo en inglés: " + soloIngles + ", sólo en español: " + soloEspanol + ")"));
+		for (AfijoDeBotin afijo : AfijoDeBotin.values()) {
+			helper.assertTrue(ingles.contains("mythicloot.afijo." + afijo.id() + ".sufijo"), Component.literal("Falta el sufijo de " + afijo.id()));
+		}
+		for (Rareza rareza : Rareza.values()) {
+			helper.assertTrue(ingles.contains("mythicloot.rareza." + rareza.getSerializedName()) && ingles.contains(rareza.claveDelAviso()),
+					Component.literal("Falta el nombre o el aviso de " + rareza.getSerializedName()));
+		}
+		helper.assertTrue(Idioma.resolver("es_MX").equals(Idioma.ESPANOL) && Idioma.resolver("en_gb").equals(Idioma.INGLES), Component.literal("Variantes de idioma"));
+		// %% es un porcentaje, igual que en las plantillas que arma el cliente
+		String robo = Idioma.tr(Idioma.ESPANOL, "mythicloot.afijo.vampirico.descripcion", "5").getString();
+		helper.assertValueEqual(robo, "Roba el 5 % del daño que hacés", "Reemplaza %s y %%");
+		helper.assertTrue(Idioma.numero(Idioma.ESPANOL, 2.5).equals("2,5") && Idioma.numero(Idioma.INGLES, 2.5).equals("2.5"), Component.literal("Coma decimal en español"));
+		helper.succeed();
+	}
+
 	private static final BlockPos DENTRO = new BlockPos(2, 1, 2);
 
 	@GameTest
@@ -87,8 +118,12 @@ public class MythicLootGameTest {
 					helper.assertTrue(danioDeVanilla, Component.literal(que + ": el arma conserva su daño de vanilla"));
 				}
 				String nombre = stack.getHoverName().getString();
-				helper.assertTrue(objeto.afijos().keySet().stream().anyMatch(a -> nombre.endsWith(a.sufijo())), Component.literal(que + ": el nombre lleva un sufijo: " + nombre));
-				helper.assertValueEqual(stack.get(DataComponents.LORE).lines().getFirst().getString(), "Rareza: " + rareza.nombre(), que + ": primera línea del lore");
+				helper.assertTrue(objeto.afijos().keySet().stream().anyMatch(a -> nombre.endsWith(a.sufijo().getString())), Component.literal(que + ": el nombre lleva un sufijo: " + nombre));
+				Component primeraLinea = stack.get(DataComponents.LORE).lines().getFirst();
+				helper.assertValueEqual(primeraLinea.getString(), Idioma.guardado("mythicloot.lore.rareza", rareza.nombre()).getString(), que + ": primera línea del lore");
+				// Guardado como traducible: un cliente con el mod lo ve en su idioma, uno vanilla ve el respaldo
+				helper.assertTrue(primeraLinea.getContents() instanceof TranslatableContents traducible && traducible.getKey().equals("mythicloot.lore.rareza")
+						&& traducible.getFallback() != null, Component.literal(que + ": el lore es traducible con respaldo"));
 			}
 		}
 		helper.succeed();
@@ -228,8 +263,9 @@ public class MythicLootGameTest {
 		ItemAttributeModifiers modificadores = resultado.get(DataComponents.ATTRIBUTE_MODIFIERS);
 		assertCerca(helper, suma(modificadores, AfijoDeBotin.AFILADO), danioDeVanilla + 1.5, "El filo no se suma dos veces");
 		assertCerca(helper, suma(modificadores, AfijoDeBotin.FURIOSO), 0.05, "La furia está");
-		helper.assertTrue(resultado.getHoverName().getString().endsWith(AfijoDeBotin.AFILADO.sufijo()), Component.literal("Se queda el nombre del de la izquierda"));
-		helper.assertValueEqual(resultado.get(DataComponents.LORE).lines().getFirst().getString(), "Rareza: rara", "El lore dice la rareza nueva");
+		helper.assertTrue(resultado.getHoverName().getString().endsWith(AfijoDeBotin.AFILADO.sufijo().getString()), Component.literal("Se queda el nombre del de la izquierda"));
+		helper.assertValueEqual(resultado.get(DataComponents.LORE).lines().getFirst().getString(),
+				Idioma.guardado("mythicloot.lore.rareza", Rareza.RARA.nombre()).getString(), "El lore dice la rareza nueva");
 
 		ItemStack gastada = conAfijo(new ItemStack(Items.COPPER_SWORD), AfijoDeBotin.AFILADO, 1.5);
 		gastada.setDamageValue(100);
@@ -391,7 +427,7 @@ public class MythicLootGameTest {
 		Configuracion c = Configuracion.POR_DEFECTO;
 		return new Configuracion(c.nivelMaximo(), c.bloquesPorNivel(), c.extraNether(), c.extraEnd(), chance, 0, chance, c.multiplicadorCampeon(),
 				c.botinDeJefe(), c.rarezaDeJefe(), c.rarezas(), c.pesosDeTipo(), c.nivelesPorMaterial(), c.netheritaSoloLegendaria(), c.valoresMaximos(),
-				c.costoPorAfijoUnido());
+				c.costoPorAfijoUnido(), c.idioma());
 	}
 
 	/** Cuenta y borra los objetos con afijos que soltó: todos los mobs del test mueren en el mismo lugar. */

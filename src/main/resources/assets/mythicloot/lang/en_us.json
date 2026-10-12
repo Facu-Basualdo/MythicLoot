@@ -1,3 +1,37 @@
 {
-	"modmenu.descriptionTranslation.mythicloot": "Hostile mobs you kill can drop weapons, bows and armor with random rarity and affixes: more damage, life steal, true-aim arrows, more health… The higher the mob's level, the better. Designed to be played with Bloodmoon & Bosses and Hero's Forge. Server-side: vanilla clients can join."
+	"modmenu.descriptionTranslation.mythicloot": "Hostile mobs you kill can drop weapons, bows and armor with random rarity and affixes: more damage, life steal, true-aim arrows, more health… The higher the mob's level, the better. Designed to be played with Bloodmoon & Bosses and Hero's Forge. Server-side: vanilla clients can join.",
+
+	"mythicloot.rareza.magica": "Magic",
+	"mythicloot.rareza.rara": "Rare",
+	"mythicloot.rareza.epica": "Epic",
+	"mythicloot.rareza.legendaria": "Legendary",
+	"mythicloot.aviso.magica": "Magic loot!",
+	"mythicloot.aviso.rara": "Rare loot!",
+	"mythicloot.aviso.epica": "Epic loot!",
+	"mythicloot.aviso.legendaria": "Legendary loot!",
+	"mythicloot.lore.rareza": "Rarity: %s",
+	"mythicloot.lore.nivel": "Level %s",
+
+	"mythicloot.afijo.afilado.sufijo": "of the Edge",
+	"mythicloot.afijo.furioso.sufijo": "of Fury",
+	"mythicloot.afijo.largo.sufijo": "of Reach",
+	"mythicloot.afijo.vampirico.sufijo": "of the Vampire",
+	"mythicloot.afijo.ardiente.sufijo": "of Flames",
+	"mythicloot.afijo.certero.sufijo": "of the Hawk",
+	"mythicloot.afijo.ligero.sufijo": "of the Wind",
+	"mythicloot.afijo.robusto.sufijo": "of the Giant",
+	"mythicloot.afijo.reforzado.sufijo": "of the Fortress",
+	"mythicloot.afijo.tenaz.sufijo": "of the Colossus",
+	"mythicloot.afijo.firme.sufijo": "of the Mountain",
+	"mythicloot.afijo.afortunado.sufijo": "of Luck",
+	"mythicloot.afijo.vampirico.descripcion": "Steals %s%% of the damage you deal",
+	"mythicloot.afijo.ardiente.descripcion.uno": "Sets targets on fire for 1 second",
+	"mythicloot.afijo.ardiente.descripcion.varios": "Sets targets on fire for %s seconds",
+	"mythicloot.afijo.certero.descripcion": "+%s%% arrow damage",
+
+	"mythicloot.comando.rareza_desconocida": "There's no rarity %s. Options: %s",
+	"mythicloot.comando.tipo_desconocido": "There's no item type %s. Options: %s",
+	"mythicloot.comando.generado": "Generated: %s",
+	"mythicloot.comando.recarga_fallida": "Couldn't reload config/mythicloot.json, keeping the previous one: %s",
+	"mythicloot.comando.recargada": "Config reloaded"
 }

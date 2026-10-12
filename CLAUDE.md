@@ -41,6 +41,7 @@ El mismo tema en distintas áreas usa el mismo nombre de archivo (`claude/mod/bo
 |---|---|---|
 | Generar objetos (rareza, material por nivel, afijos, nombre y lore) y cuándo se sueltan (chance, jefes, campeones, Bloodmoon o distancia) | [botin](claude/mod/botin.md) | [botin](claude/tests/botin.md) |
 | Afijos: atributos de vanilla y los que aplica el mod (vampírico, ardiente, certero) | [afijos](claude/mod/afijos.md) | [botin](claude/tests/botin.md) |
+| Idioma: chat por jugador, nombre y lore traducibles con respaldo | [idioma](claude/mod/idioma.md) | [botin](claude/tests/botin.md) |
 | Juntar dos objetos en el yunque: suma los afijos, sube la rareza, cobra por afijo ganado | [yunque](claude/mod/yunque.md) | [botin](claude/tests/botin.md) |
 
 ## Reglas de workflow

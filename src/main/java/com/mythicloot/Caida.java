@@ -71,7 +71,7 @@ public final class Caida {
 			level.playSound(null, mob.blockPosition(), rareza == Rareza.LEGENDARIA ? SoundEvents.UI_TOAST_CHALLENGE_COMPLETE : SoundEvents.PLAYER_LEVELUP,
 					SoundSource.PLAYERS, 1.0f, 1.2f);
 			if (jugador instanceof ServerPlayer servidor) {
-				servidor.sendSystemMessage(Component.literal("¡Botín " + rareza.masculino() + "!").withStyle(rareza.color()), true);
+				servidor.sendSystemMessage(Idioma.tr(servidor, rareza.claveDelAviso()).withStyle(rareza.color()), true);
 			}
 		}
 	}

@@ -15,6 +15,8 @@ import java.util.Map;
  * @param valoresMaximos lo que vale cada afijo en el nivel máximo, antes del azar y la rareza
  * @param costoPorAfijoUnido cuántos niveles de experiencia suma al yunque cada afijo que gana o mejora un objeto al
  *        juntarlo con otro
+ * @param idioma el de los objetos que se generan (para quien no tiene el mod en el cliente) y el de la consola; en el
+ *        chat cada jugador ve el de su cliente (ver {@link Idioma})
  */
 public record Configuracion(
 		int nivelMaximo,
@@ -32,7 +34,8 @@ public record Configuracion(
 		int nivelesPorMaterial,
 		boolean netheritaSoloLegendaria,
 		Map<String, Double> valoresMaximos,
-		int costoPorAfijoUnido) {
+		int costoPorAfijoUnido,
+		String idioma) {
 
 	/*
 	 * Pensados junto con Bloodmoon & Bosses y Hero's Forge, que llegan al nivel 100. Con 2 % + 0,08 % por nivel, un
@@ -64,7 +67,8 @@ public record Configuracion(
 			true,
 			valoresPorDefecto(),
 			// Llevar una mágica a legendaria juntando objetos cuesta 12 niveles, más lo que cobra vanilla por reparar
-			4);
+			4,
+			Idioma.INGLES);
 
 	private static Map<String, Double> valoresPorDefecto() {
 		Map<String, Double> valores = new LinkedHashMap<>();
@@ -138,6 +142,7 @@ public record Configuracion(
 			exigir(valor != null && valor > 0, "el valor máximo de " + afijo.id() + " falta o no es mayor que 0");
 		}
 		exigir(costoPorAfijoUnido >= 0, "costoPorAfijoUnido no puede ser negativo");
+		exigir(Idioma.DISPONIBLES.contains(idioma), "idioma tiene que ser " + String.join(" o ", Idioma.DISPONIBLES));
 	}
 
 	private static void exigir(boolean condicion, String mensaje) {

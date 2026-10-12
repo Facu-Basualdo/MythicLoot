@@ -122,7 +122,7 @@ public final class GeneradorDeBotin {
 		// En ITEM_NAME y no en CUSTOM_NAME: no sale en cursiva ni como "renombrado", y un yunque lo puede renombrar
 		MutableComponent nombre = Component.empty().append(stack.getHoverName());
 		if (principal != null) {
-			nombre.append(" " + principal.sufijo());
+			nombre.append(" ").append(principal.sufijo());
 		}
 		stack.set(DataComponents.ITEM_NAME, nombre.withStyle(objeto.rareza().color()));
 		ponerAfijos(stack, objeto);
@@ -149,10 +149,10 @@ public final class GeneradorDeBotin {
 		objeto.guardarEn(stack);
 
 		List<Component> lore = new ArrayList<>();
-		lore.add(Texto.lore("Rareza: " + rareza.nombre(), rareza.color()));
-		lore.add(Texto.lore("Nivel " + objeto.nivel(), ChatFormatting.GRAY));
+		lore.add(Texto.lore(Idioma.guardado("mythicloot.lore.rareza", rareza.nombre()), rareza.color()));
+		lore.add(Texto.lore(Idioma.guardado("mythicloot.lore.nivel", objeto.nivel()), ChatFormatting.GRAY));
 		objeto.afijos().forEach((afijo, valor) -> {
-			String linea = afijo.describir(valor);
+			Component linea = afijo.describir(valor);
 			if (linea != null) {
 				// Azul, como las líneas de atributos que agrega vanilla abajo
 				lore.add(Texto.lore(linea, ChatFormatting.BLUE));

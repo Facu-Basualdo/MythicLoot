@@ -8,17 +8,16 @@ final class Texto {
 	private Texto() {
 	}
 
-	/** Con coma decimal y sin ceros de más: 2.5 → "2,5", 3.0 → "3". */
+	/**
+	 * Un número para guardar en un objeto, en el idioma de la config (el del texto de respaldo): 2.5 → "2,5" en español,
+	 * 3.0 → "3". Va como texto ya armado porque el cliente no sabe formatear con coma.
+	 */
 	static String numero(double valor) {
-		double redondeado = Math.round(valor * 100) / 100.0;
-		if (redondeado == Math.rint(redondeado)) {
-			return Long.toString((long) redondeado);
-		}
-		return Double.toString(redondeado).replace('.', ',');
+		return Idioma.numero(MythicLoot.config().idioma(), valor);
 	}
 
 	/** Vanilla pone el lore en cursiva: sin el {@code withItalic(false)} se ve torcido. */
-	static MutableComponent lore(String texto, ChatFormatting color) {
-		return Component.literal(texto).withStyle(color).withStyle(estilo -> estilo.withItalic(false));
+	static MutableComponent lore(Component texto, ChatFormatting color) {
+		return texto.copy().withStyle(color).withStyle(estilo -> estilo.withItalic(false));
 	}
 }

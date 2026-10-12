@@ -1,3 +1,37 @@
 {
-	"modmenu.descriptionTranslation.mythicloot": "Los mobs hostiles que matás pueden soltar armas, arcos y armaduras con rareza y afijos al azar: más daño, robo de vida, flechas certeras, más vida… Cuanto más nivel tiene el mob, mejor. Pensado para jugarse con Bloodmoon & Bosses y Hero's Forge."
+	"modmenu.descriptionTranslation.mythicloot": "Los mobs hostiles que matás pueden soltar armas, arcos y armaduras con rareza y afijos al azar: más daño, robo de vida, flechas certeras, más vida… Cuanto más nivel tiene el mob, mejor. Pensado para jugarse con Bloodmoon & Bosses y Hero's Forge.",
+
+	"mythicloot.rareza.magica": "mágica",
+	"mythicloot.rareza.rara": "rara",
+	"mythicloot.rareza.epica": "épica",
+	"mythicloot.rareza.legendaria": "legendaria",
+	"mythicloot.aviso.magica": "¡Botín mágico!",
+	"mythicloot.aviso.rara": "¡Botín raro!",
+	"mythicloot.aviso.epica": "¡Botín épico!",
+	"mythicloot.aviso.legendaria": "¡Botín legendario!",
+	"mythicloot.lore.rareza": "Rareza: %s",
+	"mythicloot.lore.nivel": "Nivel %s",
+
+	"mythicloot.afijo.afilado.sufijo": "del Filo",
+	"mythicloot.afijo.furioso.sufijo": "de la Furia",
+	"mythicloot.afijo.largo.sufijo": "del Alcance",
+	"mythicloot.afijo.vampirico.sufijo": "del Vampiro",
+	"mythicloot.afijo.ardiente.sufijo": "de las Llamas",
+	"mythicloot.afijo.certero.sufijo": "del Halcón",
+	"mythicloot.afijo.ligero.sufijo": "del Viento",
+	"mythicloot.afijo.robusto.sufijo": "del Gigante",
+	"mythicloot.afijo.reforzado.sufijo": "de la Fortaleza",
+	"mythicloot.afijo.tenaz.sufijo": "del Coloso",
+	"mythicloot.afijo.firme.sufijo": "de la Montaña",
+	"mythicloot.afijo.afortunado.sufijo": "de la Suerte",
+	"mythicloot.afijo.vampirico.descripcion": "Roba el %s %% del daño que hacés",
+	"mythicloot.afijo.ardiente.descripcion.uno": "Prende fuego 1 segundo",
+	"mythicloot.afijo.ardiente.descripcion.varios": "Prende fuego %s segundos",
+	"mythicloot.afijo.certero.descripcion": "+%s %% de daño de las flechas",
+
+	"mythicloot.comando.rareza_desconocida": "No existe la rareza %s. Opciones: %s",
+	"mythicloot.comando.tipo_desconocido": "No existe el tipo %s. Opciones: %s",
+	"mythicloot.comando.generado": "Generado: %s",
+	"mythicloot.comando.recarga_fallida": "No se pudo recargar config/mythicloot.json, sigue la anterior: %s",
+	"mythicloot.comando.recargada": "Config recargada"
 }
