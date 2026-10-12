@@ -1,5 +1,7 @@
 # Mythic Loot
 
+<p align="center"><img src="src/main/resources/assets/botinmitico/icon.png" alt="Mythic Loot" width="256"></p>
+
 Mod de Fabric para **Minecraft Java 26.3**: los mobs hostiles que matás pueden soltar **armas, arcos y armaduras con rareza y afijos** al azar. Más daño, robo de vida, flechas certeras, más vida, más armadura… Cuanto más nivel tiene el mob, mejor es lo que suelta.
 
 Pensado para jugarse con **Bloodmoon & Bosses** (los mobs con niveles) y **Hero's Forge** (las estadísticas que se compran con experiencia): Bloodmoon hace más fuertes a los mobs, Hero's Forge te hace más fuerte a vos, y Mythic Loot hace que el equipo siga mejorando más allá de la netherita con Filo V.

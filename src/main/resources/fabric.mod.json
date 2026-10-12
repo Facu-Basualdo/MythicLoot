@@ -8,6 +8,7 @@
 		"FacuBas"
 	],
 	"license": "MIT",
+	"icon": "assets/botinmitico/icon.png",
 	"environment": "*",
 	"entrypoints": {
 		"main": [
