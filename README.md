@@ -1,14 +1,12 @@
 # Mythic Loot
 
-<p align="center"><img src="src/main/resources/assets/botinmitico/icon.png" alt="Mythic Loot" width="256"></p>
+<p align="center"><img src="src/main/resources/assets/mythicloot/icon.png" alt="Mythic Loot" width="256"></p>
 
 Mod de Fabric para **Minecraft Java 26.3**: los mobs hostiles que matás pueden soltar **armas, arcos y armaduras con rareza y afijos** al azar. Más daño, robo de vida, flechas certeras, más vida, más armadura… Cuanto más nivel tiene el mob, mejor es lo que suelta.
 
 Pensado para jugarse con **Bloodmoon & Bosses** (los mobs con niveles) y **Hero's Forge** (las estadísticas que se compran con experiencia): Bloodmoon hace más fuertes a los mobs, Hero's Forge te hace más fuerte a vos, y Mythic Loot hace que el equipo siga mejorando más allá de la netherita con Filo V.
 
-> **Estado:** versión 0.1.0. Todo lo de abajo está hecho y lo cubren las pruebas automáticas. Falta probarlo a mano en un servidor junto con Bloodmoon & Bosses.
-
-## Cómo funciona en el juego
+## Cómo funciona
 
 ### Cuándo se suelta
 
@@ -67,12 +65,12 @@ El nombre lleva el afijo principal: **"Espada de diamante del Vampiro"**. El too
 
 | Comando | Qué hace |
 |---|---|
-| `/botinmitico generar <nivel> [rareza] [tipo]` | Te da un objeto con afijos de ese nivel. `rareza`: `magica`, `rara`, `epica`, `legendaria` (si no va, al azar); `tipo`: `cuerpo_a_cuerpo`, `a_distancia`, `armadura` |
-| `/botinmitico recargar` | Vuelve a leer `config/botinmitico.json` sin reiniciar el servidor |
+| `/mythicloot generar <nivel> [rareza] [tipo]` | Te da un objeto con afijos de ese nivel. `rareza`: `magica`, `rara`, `epica`, `legendaria` (si no va, al azar); `tipo`: `cuerpo_a_cuerpo`, `a_distancia`, `armadura` |
+| `/mythicloot recargar` | Vuelve a leer `config/mythicloot.json` sin reiniciar el servidor |
 
 ## Configuración
 
-En el primer arranque se crea **`config/botinmitico.json`** con los valores por defecto. Editalo y usá `/botinmitico recargar`, o reiniciá el servidor.
+En el primer arranque se crea **`config/mythicloot.json`** con los valores por defecto. Editalo y usá `/mythicloot recargar`, o reiniciá el servidor.
 
 - Si el archivo tiene un error (JSON mal escrito o un valor imposible), se queda la configuración que había, el archivo no se toca y el error aparece en el chat y en la consola.
 - Si falta una clave se usa su valor por defecto, y al leer el archivo se reescribe completo. Una clave que no existe se ignora con un aviso en la consola.
@@ -91,61 +89,28 @@ En el primer arranque se crea **`config/botinmitico.json`** con los valores por 
 | `netheritaSoloLegendaria` | `true` | Si la netherita sólo sale en legendarias |
 | `valoresMaximos` | ver la tabla de afijos | Lo que vale cada afijo en el nivel máximo: los porcentajes como fracción (`0.08` = 8 %), el fuego en segundos |
 
-## Requisitos
+## Funciona con
 
-| | Versión |
-|---|---|
-| Minecraft Java | 26.3 |
-| [Fabric Loader](https://fabricmc.net/use/) | 0.19.5 o más nuevo |
-| [Fabric API](https://modrinth.com/mod/fabric-api) | para 26.3 |
-| Java | 25 |
-| Bloodmoon & Bosses | opcional, recomendado |
+- **Bloodmoon & Bosses** (recomendado): el nivel del botín es el del mob, los campeones tienen el doble de chance y los jefes de zona sueltan siempre una épica o mejor. Los mobs de spawners no sueltan nada.
+- **Hero's Forge:** el robo de vida y el daño a distancia de sus estadísticas se suman a los afijos.
+- **Soul Link:** no se tocan.
 
-## Instalación
+## Requisitos e instalación
 
-Toda la lógica corre en el servidor.
+Minecraft Java 26.3, [Fabric Loader](https://fabricmc.net/use/) 0.19.5 o más nuevo, [Fabric API](https://modrinth.com/mod/fabric-api) y Java 25. Toda la lógica corre en el servidor.
 
-- **Servidor dedicado:** copiá `botinmitico-<versión>.jar` y Fabric API a la carpeta `mods/` del servidor. Los jugadores no necesitan instalar nada.
-- **Singleplayer o LAN:** instalalo en el cliente del que abre el mundo, junto con Fabric API.
-- Anda junto con Bloodmoon & Bosses, Hero's Forge y Soul Link.
+- **Servidor:** copiá `mythicloot-<versión>.jar` y Fabric API a `mods/`. Los jugadores no necesitan nada: los objetos usan componentes de vanilla.
+- **Singleplayer o LAN:** en el cliente del que abre el mundo, junto con Fabric API.
 
-## Compilar
+## Desarrollo
 
 ```bash
-./gradlew build          # Windows: gradlew build
+./gradlew build          # compila y corre las pruebas; el jar queda en build/libs/
+./gradlew runGameTest    # sólo las pruebas automáticas, en un servidor sin ventana
 ```
 
-El jar queda en `build/libs/`. El proyecto pide Java 25 (`gradle/gradle-daemon-jvm.properties`): si Gradle no encuentra tu JDK 25, agregá a tu `~/.gradle/gradle.properties` (el global, no el del repo) la línea `org.gradle.java.installations.paths=<ruta a tu JDK 25>`.
-
-## Probar
-
-```bash
-./gradlew runGameTest    # pruebas automáticas en un servidor sin ventana
-```
-
-Las pruebas verifican:
-
-- que cada tipo y rareza salga con sus datos, la cantidad justa de afijos, sólo los que le sirven, los atributos en el objeto (sin perder el daño de vanilla del arma), el nombre con el sufijo y la rareza en el tooltip;
-- la cuenta de los valores por nivel y rareza, el material por nivel (netherita sólo legendaria) y que un jefe nunca suelte menos de la rareza mínima;
-- que dos piezas de armadura con el mismo afijo sumen;
-- el vampírico y el ardiente al pegar, y el certero y el ardiente en las flechas (sin aplicarse dos veces);
-- el sorteo con Bloodmoon (nivel del mob, sin nivel no suelta, campeones, jefes) y sin él (nivel por distancia);
-- que sólo suelte si lo mató un jugador y si es hostil;
-- la lectura de la config (valores por defecto, archivos parciales, valores inválidos).
-
-Para probar a mano, mirá [claude/general/probar-en-el-juego.md](claude/general/probar-en-el-juego.md).
-
-## Estructura
-
-```
-src/main/       el mod: genera los objetos, los suelta al morir el mob y aplica los afijos que no son atributos
-src/gametest/   pruebas automáticas (Fabric GameTest)
-claude/         documentación técnica para agentes de IA (invariantes, decisiones y bugs ya resueltos)
-docs/           el plan del mod
-```
-
-Para entender por qué el código está hecho así, empezá por [CLAUDE.md](CLAUDE.md) y [claude/mod/INDICE.md](claude/mod/INDICE.md).
+Pide Java 25: si Gradle no encuentra tu JDK, agregá `org.gradle.java.installations.paths=<ruta a tu JDK 25>` a tu `~/.gradle/gradle.properties`. La documentación técnica está en [CLAUDE.md](CLAUDE.md).
 
 ## Licencia
 
-[MIT](LICENSE): podés usarlo, modificarlo y redistribuirlo (también en modpacks) siempre que mantengas el aviso de copyright.
+[MIT](LICENSE).
