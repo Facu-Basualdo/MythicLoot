@@ -17,7 +17,7 @@ Mismas reglas que los otros mods: todo en el servidor (componentes de vanilla, s
 
 ## Fases
 
-1. **0.1.0 — hecha:** generar (rareza, material, afijos, nombre, lore), soltar al morir, los 12 afijos, la config, `/botinmitico generar` y `recargar`, y los gametests.
+1. **0.1.0 — hecha:** generar (rareza, material, afijos, nombre, lore), soltar al morir, los 12 afijos, la config, `/mythicloot generar` y `recargar`, y los gametests.
 
 ## Pendiente
 

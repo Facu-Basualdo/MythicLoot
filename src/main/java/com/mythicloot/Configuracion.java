@@ -1,10 +1,10 @@
-package com.botinmitico;
+package com.mythicloot;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * Los números de balance. Se lee de {@code config/botinmitico.json} mezclado sobre {@link #POR_DEFECTO} (ver
+ * Los números de balance. Se lee de {@code config/mythicloot.json} mezclado sobre {@link #POR_DEFECTO} (ver
  * {@link ArchivoDeConfiguracion}). Los mapas usan los ids de {@link Rareza}, {@link TipoDeObjeto} y {@link AfijoDeBotin}.
  *
  * @param bloquesPorNivel sin Bloodmoon & Bosses, cada cuántos bloques del spawn sube el nivel del botín

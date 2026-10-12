@@ -10,7 +10,7 @@ repositories {
 
 loom {
 	mods {
-		"botinmitico" {
+		"mythicloot" {
 			sourceSet sourceSets.main
 		}
 	}
@@ -64,7 +64,7 @@ java {
 fabricApi {
 	configureTests {
 		createSourceSet = true
-		modId = "botinmitico-test"
+		modId = "mythicloot-test"
 		enableGameTests = true
 		enableClientGameTests = false
 		eula = true

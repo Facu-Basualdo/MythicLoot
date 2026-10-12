@@ -28,7 +28,7 @@ Una legendaria necesita 4 afijos distintos: **cada tipo tiene que tener al menos
 
 ## Atributos: el id lleva el grupo de slots
 
-**El modificador se llama `botinmitico:<afijo>/<grupo>`** (`botinmitico:robusto/head`, `botinmitico:afilado/mainhand`). Vanilla aplica los `attribute_modifiers` de cada pieza equipada con su id, y un `AttributeInstance` guarda **un modificador por id**: si el casco y las botas usaran `botinmitico:robusto`, la segunda pieza reemplazaría a la primera y no sumarían. Es el mismo motivo por el que vanilla nombra la armadura `armor.helmet`, `armor.boots`…
+**El modificador se llama `mythicloot:<afijo>/<grupo>`** (`mythicloot:robusto/head`, `mythicloot:afilado/mainhand`). Vanilla aplica los `attribute_modifiers` de cada pieza equipada con su id, y un `AttributeInstance` guarda **un modificador por id**: si el casco y las botas usaran `mythicloot:robusto`, la segunda pieza reemplazaría a la primera y no sumarían. Es el mismo motivo por el que vanilla nombra la armadura `armor.helmet`, `armor.boots`…
 
 - El grupo de la armadura sale de `EQUIPPABLE.slot()` con `EquipmentSlotGroup.bySlot`; las armas y los arcos usan `MAINHAND`.
 - Las armas y armaduras de vanilla ya traen `attribute_modifiers` (el daño de la espada, la armadura del peto): se suman con `withModifierAdded`, nunca se reemplazan (ver [Botín](botin.md#qué-se-guarda-en-el-objeto)).

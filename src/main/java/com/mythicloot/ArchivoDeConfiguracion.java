@@ -1,4 +1,4 @@
-package com.botinmitico;
+package com.mythicloot;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -14,7 +14,7 @@ import com.google.gson.JsonParser;
 
 import net.fabricmc.loader.api.FabricLoader;
 
-/** config/botinmitico.json: los valores de Configuracion, editables sin recompilar. */
+/** config/mythicloot.json: los valores de Configuracion, editables sin recompilar. */
 public final class ArchivoDeConfiguracion {
 	private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
@@ -22,7 +22,7 @@ public final class ArchivoDeConfiguracion {
 	}
 
 	public static Path ruta() {
-		return FabricLoader.getInstance().getConfigDir().resolve(BotinMitico.MOD_ID + ".json");
+		return FabricLoader.getInstance().getConfigDir().resolve(MythicLoot.MOD_ID + ".json");
 	}
 
 	/**
@@ -53,7 +53,7 @@ public final class ArchivoDeConfiguracion {
 			JsonElement porDefecto = destino.get(clave);
 			if (porDefecto == null) {
 				// Un nombre mal escrito quedaría ignorado en silencio: mejor avisar
-				BotinMitico.LOGGER.warn("Configuración: no existe la clave \"{}{}\", se ignora", prefijo, clave);
+				MythicLoot.LOGGER.warn("Configuración: no existe la clave \"{}{}\", se ignora", prefijo, clave);
 			} else if (porDefecto.isJsonObject() && entrada.getValue().isJsonObject()) {
 				mezclar(porDefecto.getAsJsonObject(), entrada.getValue().getAsJsonObject(), prefijo + clave + ".");
 			} else {

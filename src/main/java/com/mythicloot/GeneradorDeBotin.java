@@ -1,4 +1,4 @@
-package com.botinmitico;
+package com.mythicloot;
 
 import java.util.ArrayList;
 import java.util.EnumMap;
@@ -162,7 +162,7 @@ public final class GeneradorDeBotin {
 		for (Map.Entry<AfijoDeBotin, Double> entrada : objeto.afijos().entrySet()) {
 			AfijoDeBotin afijo = entrada.getKey();
 			if (afijo.atributo() != null) {
-				AttributeModifier modificador = new AttributeModifier(BotinMitico.id(afijo.id() + "/" + grupo.getSerializedName()), entrada.getValue(), afijo.operacion());
+				AttributeModifier modificador = new AttributeModifier(MythicLoot.id(afijo.id() + "/" + grupo.getSerializedName()), entrada.getValue(), afijo.operacion());
 				modificadores = modificadores.withModifierAdded(afijo.atributo(), modificador, grupo);
 			}
 		}

@@ -4,7 +4,7 @@
 
 Síntomas que esta nota evita: un test de Bloodmoon deja el modo prendido y otro test en paralelo ve mobs sin nivel; un test de chance pasa a veces; el test de la armadura falla porque el jugador "no se puso" el casco.
 
-Todo está en `BotinMiticoGameTest`.
+Todo está en `MythicLootGameTest`.
 
 ## Qué cubre
 
@@ -21,9 +21,9 @@ Todo está en `BotinMiticoGameTest`.
 
 ## Cosas que no son obvias
 
-- **Bloodmoon no está en el classpath de los tests.** `AttachmentsDeBloodmoon` (entrypoint `main` del mod de test) registra `mobspoderosos:nivel`, `jefe` y `afijo` con los codecs de Bloodmoon, y `NivelDelMob` los encuentra por id igual que encontraría los de verdad.
+- **Bloodmoon no está en el classpath de los tests.** `AttachmentsDeBloodmoon` (entrypoint `main` del mod de test) registra `bloodmoonandbosses:nivel`, `jefe` y `afijo` con los codecs de Bloodmoon, y `NivelDelMob` los encuentra por id igual que encontraría los de verdad.
 - **El modo Bloodmoon y la config son globales y los tests corren en paralelo:** se cambian y se restauran (en `finally`) **dentro del mismo método**, que corre entero en un tick. Si quedaran puestos entre ticks, otro test los vería.
-- **`Caida.sortear` recibe la config:** los casos de chance 0 y 1 se arman con `conChance` y no tocan la global. Sólo `alMorir` lee la global, y por eso su test usa `BotinMitico.usar`.
+- **`Caida.sortear` recibe la config:** los casos de chance 0 y 1 se arman con `conChance` y no tocan la global. Sólo `alMorir` lee la global, y por eso su test usa `MythicLoot.usar`.
 - **Los afijos exactos se arman con `GeneradorDeBotin.armar`** y un `ObjetoConAfijos` hecho a mano: con `generar` saldrían al azar.
 - **Los jugadores de prueba no tickean** (su conexión es un `EmbeddedChannel`), y vanilla aplica los atributos del equipo en el tick: la armadura se prueba con un zombi, que sí tickea, y `runAfterDelay(2)`.
 - **Matá con `playerAttack(jugador)`** para que `getLastHurtByPlayer()` lo tenga. El jugador sale de `entrar()` (supervivencia), no de `makeMockServerPlayerInLevel`, que fuerza creativo.

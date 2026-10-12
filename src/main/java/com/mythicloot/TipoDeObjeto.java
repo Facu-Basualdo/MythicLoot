@@ -1,4 +1,4 @@
-package com.botinmitico;
+package com.mythicloot;
 
 import org.jspecify.annotations.Nullable;
 

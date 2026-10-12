@@ -1,4 +1,4 @@
-package com.botinmitico;
+package com.mythicloot;
 
 import org.jspecify.annotations.Nullable;
 
@@ -20,12 +20,12 @@ import net.minecraft.world.level.Level;
  * guardados en el NBT de los mobs de todos los mundos), así que son un contrato más firme que un nombre de clase.
  */
 public final class NivelDelMob {
-	public static final String BLOODMOON = "mobspoderosos";
+	public static final String BLOODMOON = "bloodmoonandbosses";
 	private static final Identifier NIVEL = Identifier.fromNamespaceAndPath(BLOODMOON, "nivel");
 	private static final Identifier JEFE = Identifier.fromNamespaceAndPath(BLOODMOON, "jefe");
 	private static final Identifier AFIJO = Identifier.fromNamespaceAndPath(BLOODMOON, "afijo");
 
-	// Lo decide BotinMitico al iniciar (si está Bloodmoon); los tests lo fuerzan
+	// Lo decide MythicLoot al iniciar (si está Bloodmoon); los tests lo fuerzan
 	private static volatile boolean conBloodmoon;
 
 	private NivelDelMob() {

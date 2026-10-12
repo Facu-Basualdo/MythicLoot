@@ -1,4 +1,4 @@
-package com.botinmitico;
+package com.mythicloot;
 
 import java.util.Collections;
 import java.util.EnumMap;
@@ -12,7 +12,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.CustomData;
 
 /**
- * Lo que el mod guarda en el objeto, dentro de {@code custom_data} bajo la clave {@code botinmitico}:
+ * Lo que el mod guarda en el objeto, dentro de {@code custom_data} bajo la clave {@code mythicloot}:
  * {@code {nivel: 57, rareza: "epica", afijos: {vampirico: 0.05, certero: 0.3}}}. Es un componente de vanilla: viaja
  * con el objeto a cofres, al yunque y a otros jugadores sin que el cliente necesite el mod.
  *
@@ -20,7 +20,7 @@ import net.minecraft.world.item.component.CustomData;
  * afijos, para los que no son atributos y para saber qué es cada objeto.
  */
 public record ObjetoConAfijos(int nivel, Rareza rareza, Map<AfijoDeBotin, Double> afijos) {
-	static final String CLAVE = BotinMitico.MOD_ID;
+	static final String CLAVE = MythicLoot.MOD_ID;
 
 	public ObjetoConAfijos {
 		EnumMap<AfijoDeBotin, Double> copia = new EnumMap<>(AfijoDeBotin.class);

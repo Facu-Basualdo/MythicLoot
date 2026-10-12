@@ -1,6 +1,6 @@
 # Mythic Loot — mod de Minecraft
 
-**El nombre visible es "Mythic Loot", pero el id es y sigue siendo `botinmitico`** (paquete, comando, config, la clave del `custom_data` y los ids de los modificadores). No lo renombres: va guardado en cada objeto que ya se soltó, y un id nuevo los dejaría sin afijos.
+**El id es `mythicloot`** (en la 0.1.0 era `botinmitico`, que nunca se usó en un mundo: no hay nada que migrar) (paquete, comando, config, la clave del `custom_data` y los ids de los modificadores). No lo renombres: va guardado en cada objeto que ya se soltó, y un id nuevo los dejaría sin afijos.
 
 Mod de Fabric para **Minecraft Java 26.3**: los mobs hostiles que mata un jugador pueden soltar armas, arcos y armaduras con **rareza** (mágica, rara, épica, legendaria) y de 1 a 4 **afijos** al azar (más daño, robo de vida, flechas certeras, más vida…), mejores cuanto más nivel tiene el mob. Con **Bloodmoon & Bosses** el nivel es el del mob y los jefes de zona sueltan siempre uno; sin él, sale de la distancia al spawn. Java 25, Gradle 9.7 + Fabric Loom 1.18, Fabric Loader 0.19.5, Fabric API 0.162.0+26.3. Toda la lógica corre en el servidor: los objetos usan componentes de vanilla y un cliente sin el mod los ve completos.
 
@@ -33,7 +33,7 @@ El mismo tema en distintas áreas usa el mismo nombre de archivo (`claude/mod/bo
 |---|---|
 | [Entorno Java y Gradle](claude/general/entorno-java-gradle.md) | `~/.gradle/gradle.properties` fuerza JDK 17 (React Native) y gana sobre el proyecto · Java 25 se fija con `gradle/gradle-daemon-jvm.properties` + `org.gradle.java.installations.paths` en el `gradle.properties` **global** · sin eso Loom falla con "requires JVM runtime version 25" |
 | [Minecraft 26.x sin ofuscar](claude/general/minecraft-26-sin-ofuscar.md) | Desde 26.1 se usan los nombres de Mojang (Yarn está muerto) · verificá firmas con `javap` sobre el jar de `.gradle/loom-cache` · las constantes de entidades están en `EntityTypes` |
-| [Probar en el juego](claude/general/probar-en-el-juego.md) | `runServer` necesita `eula=true` y `online-mode=false` en `run/` · `/botinmitico generar <nivel> [rareza] [tipo]` da un objeto sin matar nada · probá con un cliente vanilla |
+| [Probar en el juego](claude/general/probar-en-el-juego.md) | `runServer` necesita `eula=true` y `online-mode=false` en `run/` · `/mythicloot generar <nivel> [rareza] [tipo]` da un objeto sin matar nada · probá con un cliente vanilla |
 
 ## Features que cruzan áreas
 
@@ -53,8 +53,8 @@ El mismo tema en distintas áreas usa el mismo nombre de archivo (`claude/mod/bo
 
 ## Convenciones de código
 
-- Paquete `com.botinmitico`; mixins en `com.botinmitico.mixin`, registrados en `src/main/resources/botinmitico.mixins.json`.
-- **Métodos y accessors agregados por mixins llevan prefijo `botinmitico$`** para no chocar con otros mods.
+- Paquete `com.mythicloot`; mixins en `com.mythicloot.mixin`, registrados en `src/main/resources/mythicloot.mixins.json`.
+- **Métodos y accessors agregados por mixins llevan prefijo `mythicloot$`** para no chocar con otros mods.
 - **Ningún número de balance escrito a mano en el código:** van en `Configuracion`.
 - **Los ids de `AfijoDeBotin` y `Rareza` no se renombran nunca:** van en el `custom_data` de los objetos. El nombre visible (`sufijo`, `nombre`) sí se puede cambiar.
 - **No se depende de las clases de Bloodmoon & Bosses:** se leen sus attachments por id (ver [botin](claude/mod/botin.md)).

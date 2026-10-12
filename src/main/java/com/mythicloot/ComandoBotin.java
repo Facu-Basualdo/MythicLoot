@@ -1,4 +1,4 @@
-package com.botinmitico;
+package com.mythicloot;
 
 import java.util.Arrays;
 
@@ -18,13 +18,13 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.item.ItemStack;
 
-/** {@code /botinmitico generar <nivel> [rareza] [tipo]} y {@code /botinmitico recargar}, los dos para ops. */
+/** {@code /mythicloot generar <nivel> [rareza] [tipo]} y {@code /mythicloot recargar}, los dos para ops. */
 public final class ComandoBotin {
 	private ComandoBotin() {
 	}
 
 	public static void registrar(CommandDispatcher<CommandSourceStack> dispatcher) {
-		dispatcher.register(Commands.literal(BotinMitico.MOD_ID)
+		dispatcher.register(Commands.literal(MythicLoot.MOD_ID)
 				.requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
 				.then(Commands.literal("generar")
 						.then(Commands.argument("nivel", IntegerArgumentType.integer(1))
@@ -42,7 +42,7 @@ public final class ComandoBotin {
 	private static int generar(CommandContext<CommandSourceStack> ctx, @Nullable String idRareza, @Nullable String idTipo) throws CommandSyntaxException {
 		CommandSourceStack fuente = ctx.getSource();
 		ServerPlayer jugador = fuente.getPlayerOrException();
-		Configuracion config = BotinMitico.config();
+		Configuracion config = MythicLoot.config();
 		RandomSource random = jugador.getRandom();
 		int nivel = IntegerArgumentType.getInteger(ctx, "nivel");
 
@@ -67,9 +67,9 @@ public final class ComandoBotin {
 	}
 
 	private static int recargar(CommandContext<CommandSourceStack> ctx) {
-		String error = BotinMitico.cargarConfiguracion();
+		String error = MythicLoot.cargarConfiguracion();
 		if (error != null) {
-			ctx.getSource().sendFailure(Component.literal("No se pudo recargar config/botinmitico.json, sigue la anterior: " + error));
+			ctx.getSource().sendFailure(Component.literal("No se pudo recargar config/mythicloot.json, sigue la anterior: " + error));
 			return 0;
 		}
 		ctx.getSource().sendSuccess(() -> Component.literal("Config recargada"), true);

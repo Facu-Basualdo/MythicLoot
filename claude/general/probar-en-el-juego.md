@@ -9,10 +9,10 @@ Los gametests ([tests: botín](../tests/botin.md)) cubren la lógica, pero no mu
 1. `gradlew runServer` una vez. Crea `run/` y se cierra pidiendo la EULA.
 2. En `run/eula.txt` poné `eula=true` (es aceptar la EULA de Mojang: lo hace la persona, no el agente).
 3. En `run/server.properties` poné **`online-mode=false`**: los clientes de desarrollo no tienen cuenta autenticada y sin esto el servidor los rechaza.
-4. `gradlew runServer` de nuevo, y `op Player…` en la consola para poder usar `/botinmitico`.
+4. `gradlew runServer` de nuevo, y `op Player…` en la consola para poder usar `/mythicloot`.
 5. `gradlew runClient` → *Multijugador → Conexión directa → `localhost`*.
 
-Para probarlo con Bloodmoon & Bosses, copiá su jar (`BloodmoonAndBosses/build/libs/mobspoderosos-<versión>.jar`) a `run/mods/` antes de arrancar el servidor.
+Para probarlo con Bloodmoon & Bosses, copiá su jar (`BloodmoonAndBosses/build/libs/bloodmoonandbosses-<versión>.jar`) a `run/mods/` antes de arrancar el servidor.
 
 **Después de cambiar código hay que reiniciar el cliente y el servidor:** no hay hot reload.
 
@@ -20,12 +20,12 @@ Para probarlo con Bloodmoon & Bosses, copiá su jar (`BloodmoonAndBosses/build/l
 
 | Comando | Para qué |
 |---|---|
-| `/botinmitico generar <nivel> [rareza] [tipo]` | Te da un objeto sin matar nada. `rareza`: `magica`, `rara`, `epica`, `legendaria`; `tipo`: `cuerpo_a_cuerpo`, `a_distancia`, `armadura` |
-| `/botinmitico recargar` | Vuelve a leer `run/config/botinmitico.json` |
-| `/mobspoderosos invocar zombie 60` (con Bloodmoon) | Un mob con nivel para matarlo |
-| `/mobspoderosos evento jefe` (con Bloodmoon) | Un jefe de zona, que suelta siempre |
+| `/mythicloot generar <nivel> [rareza] [tipo]` | Te da un objeto sin matar nada. `rareza`: `magica`, `rara`, `epica`, `legendaria`; `tipo`: `cuerpo_a_cuerpo`, `a_distancia`, `armadura` |
+| `/mythicloot recargar` | Vuelve a leer `run/config/mythicloot.json` |
+| `/bloodmoon invocar zombie 60` (con Bloodmoon) | Un mob con nivel para matarlo |
+| `/bloodmoon evento jefe` (con Bloodmoon) | Un jefe de zona, que suelta siempre |
 
-Para ver soltar sin esperar la chance, poné `"chanceBase": 1` y `"chanceMaxima": 1` en la config y `/botinmitico recargar`.
+Para ver soltar sin esperar la chance, poné `"chanceBase": 1` y `"chanceMaxima": 1` en la config y `/mythicloot recargar`.
 
 ## Qué mirar
 

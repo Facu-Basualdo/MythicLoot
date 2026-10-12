@@ -1,4 +1,4 @@
-package com.botinmitico;
+package com.mythicloot;
 
 import java.io.IOException;
 
@@ -17,8 +17,8 @@ import net.fabricmc.loader.api.FabricLoader;
 
 import net.minecraft.resources.Identifier;
 
-public class BotinMitico implements ModInitializer {
-	public static final String MOD_ID = "botinmitico";
+public class MythicLoot implements ModInitializer {
+	public static final String MOD_ID = "mythicloot";
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
 	/** Una flecha a la que ya se le aplicaron los afijos del arco. Persistente: el daño subido ya viaja en su NBT. */

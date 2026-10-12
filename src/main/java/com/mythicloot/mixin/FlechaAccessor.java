@@ -1,4 +1,4 @@
-package com.botinmitico.mixin;
+package com.mythicloot.mixin;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
@@ -9,5 +9,5 @@ import net.minecraft.world.entity.projectile.arrow.AbstractArrow;
 @Mixin(AbstractArrow.class)
 public interface FlechaAccessor {
 	@Accessor("baseDamage")
-	double botinmitico$danioBase();
+	double mythicloot$danioBase();
 }

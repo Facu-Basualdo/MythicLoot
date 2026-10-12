@@ -1,8 +1,8 @@
-package com.botinmitico;
+package com.mythicloot;
 
 import org.jspecify.annotations.Nullable;
 
-import com.botinmitico.mixin.FlechaAccessor;
+import com.mythicloot.mixin.FlechaAccessor;
 
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
@@ -30,13 +30,13 @@ public final class Efectos {
 		}
 		ObjetoConAfijos arma = ObjetoConAfijos.de(flecha.getWeaponItem());
 		// La marca evita aplicarlo dos veces: ENTITY_LOAD también corre cuando la flecha vuelve a cargarse con su chunk
-		if (arma == null || flecha.getAttached(BotinMitico.FLECHA_POTENCIADA) != null) {
+		if (arma == null || flecha.getAttached(MythicLoot.FLECHA_POTENCIADA) != null) {
 			return;
 		}
-		flecha.setAttached(BotinMitico.FLECHA_POTENCIADA, true);
+		flecha.setAttached(MythicLoot.FLECHA_POTENCIADA, true);
 		double certero = arma.valor(AfijoDeBotin.CERTERO);
 		if (certero > 0) {
-			flecha.setBaseDamage(((FlechaAccessor) flecha).botinmitico$danioBase() * (1 + certero));
+			flecha.setBaseDamage(((FlechaAccessor) flecha).mythicloot$danioBase() * (1 + certero));
 		}
 		double fuego = arma.valor(AfijoDeBotin.ARDIENTE);
 		if (fuego > 0) {

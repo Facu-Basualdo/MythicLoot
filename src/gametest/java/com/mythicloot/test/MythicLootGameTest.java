@@ -1,4 +1,4 @@
-package com.botinmitico.test;
+package com.mythicloot.test;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -12,17 +12,17 @@ import java.util.UUID;
 import com.mojang.authlib.GameProfile;
 import io.netty.channel.embedded.EmbeddedChannel;
 
-import com.botinmitico.AfijoDeBotin;
-import com.botinmitico.ArchivoDeConfiguracion;
-import com.botinmitico.BotinMitico;
-import com.botinmitico.Caida;
-import com.botinmitico.Configuracion;
-import com.botinmitico.GeneradorDeBotin;
-import com.botinmitico.NivelDelMob;
-import com.botinmitico.ObjetoConAfijos;
-import com.botinmitico.Rareza;
-import com.botinmitico.TipoDeObjeto;
-import com.botinmitico.mixin.FlechaAccessor;
+import com.mythicloot.AfijoDeBotin;
+import com.mythicloot.ArchivoDeConfiguracion;
+import com.mythicloot.MythicLoot;
+import com.mythicloot.Caida;
+import com.mythicloot.Configuracion;
+import com.mythicloot.GeneradorDeBotin;
+import com.mythicloot.NivelDelMob;
+import com.mythicloot.ObjetoConAfijos;
+import com.mythicloot.Rareza;
+import com.mythicloot.TipoDeObjeto;
+import com.mythicloot.mixin.FlechaAccessor;
 
 import net.fabricmc.fabric.api.gametest.v1.GameTest;
 
@@ -51,7 +51,7 @@ import net.minecraft.world.level.GameType;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
-public class BotinMiticoGameTest {
+public class MythicLootGameTest {
 	private static final BlockPos DENTRO = new BlockPos(2, 1, 2);
 
 	@GameTest
@@ -81,7 +81,7 @@ public class BotinMiticoGameTest {
 				}
 				if (tipo == TipoDeObjeto.CUERPO_A_CUERPO) {
 					boolean danioDeVanilla = modificadores.modifiers().stream().anyMatch(m -> m.attribute().equals(Attributes.ATTACK_DAMAGE)
-							&& !m.modifier().id().getNamespace().equals(BotinMitico.MOD_ID));
+							&& !m.modifier().id().getNamespace().equals(MythicLoot.MOD_ID));
 					helper.assertTrue(danioDeVanilla, Component.literal(que + ": el arma conserva su daño de vanilla"));
 				}
 				String nombre = stack.getHoverName().getString();
@@ -176,18 +176,18 @@ public class BotinMiticoGameTest {
 		GeneradorDeBotin.armar(arco, TipoDeObjeto.A_DISTANCIA, new ObjetoConAfijos(50, Rareza.RARA, afijos), AfijoDeBotin.CERTERO);
 
 		Arrow flecha = new Arrow(level, jugador, new ItemStack(Items.ARROW), arco);
-		double base = ((FlechaAccessor) flecha).botinmitico$danioBase();
+		double base = ((FlechaAccessor) flecha).mythicloot$danioBase();
 		flecha.setPos(helper.absoluteVec(Vec3.atCenterOf(DENTRO)));
 		level.addFreshEntity(flecha);
-		assertCerca(helper, ((FlechaAccessor) flecha).botinmitico$danioBase(), base * 1.5, "Al aparecer, el certero sube el daño base un 50 %");
+		assertCerca(helper, ((FlechaAccessor) flecha).mythicloot$danioBase(), base * 1.5, "Al aparecer, el certero sube el daño base un 50 %");
 		helper.assertTrue(flecha.isOnFire(), Component.literal("Y el ardiente la prende"));
-		com.botinmitico.Efectos.alDisparar(flecha, level);
-		assertCerca(helper, ((FlechaAccessor) flecha).botinmitico$danioBase(), base * 1.5, "Cargarla de nuevo no lo aplica dos veces");
+		com.mythicloot.Efectos.alDisparar(flecha, level);
+		assertCerca(helper, ((FlechaAccessor) flecha).mythicloot$danioBase(), base * 1.5, "Cargarla de nuevo no lo aplica dos veces");
 
 		Arrow comun = new Arrow(level, jugador, new ItemStack(Items.ARROW), new ItemStack(Items.BOW));
 		comun.setPos(helper.absoluteVec(Vec3.atCenterOf(DENTRO)));
 		level.addFreshEntity(comun);
-		assertCerca(helper, ((FlechaAccessor) comun).botinmitico$danioBase(), base, "Con un arco común, el de vanilla");
+		assertCerca(helper, ((FlechaAccessor) comun).mythicloot$danioBase(), base, "Con un arco común, el de vanilla");
 
 		flecha.discard();
 		comun.discard();
@@ -243,8 +243,8 @@ public class BotinMiticoGameTest {
 	public void alMorirSueltaSiLoMatoUnJugador(GameTestHelper helper) {
 		ServerLevel level = helper.getLevel();
 		ServerPlayer jugador = entrar(helper, "verdugo");
-		Configuracion antes = BotinMitico.config();
-		BotinMitico.usar(conChance(1));
+		Configuracion antes = MythicLoot.config();
+		MythicLoot.usar(conChance(1));
 		try {
 			Zombie muerto = helper.spawn(EntityTypes.ZOMBIE, DENTRO);
 			muerto.hurtServer(level, jugador.damageSources().playerAttack(jugador), 10_000);
@@ -258,7 +258,7 @@ public class BotinMiticoGameTest {
 			golem.hurtServer(level, jugador.damageSources().playerAttack(jugador), 10_000);
 			helper.assertValueEqual(contarObjetos(helper, golem), 0, "Sin Bloodmoon, un mob que no es hostil no suelta");
 		} finally {
-			BotinMitico.usar(antes);
+			MythicLoot.usar(antes);
 		}
 		salir(helper, jugador);
 		helper.succeed();
@@ -267,7 +267,7 @@ public class BotinMiticoGameTest {
 	@GameTest
 	public void archivoDeConfiguracion(GameTestHelper helper) {
 		try {
-			Path carpeta = Files.createTempDirectory("botinmitico");
+			Path carpeta = Files.createTempDirectory("mythicloot");
 			Path nuevo = carpeta.resolve("nuevo.json");
 			helper.assertValueEqual(ArchivoDeConfiguracion.leer(nuevo), Configuracion.POR_DEFECTO, "Sin archivo, los valores por defecto");
 			String escrito = Files.readString(nuevo);

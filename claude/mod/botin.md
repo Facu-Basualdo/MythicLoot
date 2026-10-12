@@ -27,7 +27,7 @@ El objeto cae con `spawnAtLocation`. **Épicas y legendarias quedan brillando** 
 
 | | Nivel | Jefe / campeón |
 |---|---|---|
-| Con Bloodmoon (`isModLoaded("mobspoderosos")`) | El attachment `mobspoderosos:nivel` del mob. **Sin él, null: no suelta** | `mobspoderosos:jefe` / `mobspoderosos:afijo` |
+| Con Bloodmoon (`isModLoaded("bloodmoonandbosses")`) | El attachment `bloodmoonandbosses:nivel` del mob. **Sin él, null: no suelta** | `bloodmoonandbosses:jefe` / `bloodmoonandbosses:afijo` |
 | Sin Bloodmoon | `porDistancia`: 1 cada `bloquesPorNivel` desde el spawn, Nether ×8 + `extraNether`, End desde (0, 0) + `extraEnd` (la cuenta de Bloodmoon por defecto, sin días ni campeones) | Nunca |
 
 - **Con Bloodmoon, los mobs de spawners, huevos y comandos no tienen nivel a propósito** (para que las granjas no cambien), y por eso tampoco sueltan botín con afijos. Sin Bloodmoon no se puede distinguir: un mob de spawner cuenta, con el nivel bajo del lugar.
@@ -61,7 +61,7 @@ Todo en **componentes de vanilla**: un cliente sin el mod lo ve entero, y el obj
 
 | Componente | Qué lleva |
 |---|---|
-| `custom_data` | Bajo la clave `botinmitico`: `{nivel, rareza, afijos: {id: valor}}` (`ObjetoConAfijos`). `CustomData.update` no pisa las claves de otros mods |
+| `custom_data` | Bajo la clave `mythicloot`: `{nivel, rareza, afijos: {id: valor}}` (`ObjetoConAfijos`). `CustomData.update` no pisa las claves de otros mods |
 | `attribute_modifiers` | **Los de vanilla más los de los afijos** (`withModifierAdded` sobre el que ya trae el ítem): si se pusiera uno nuevo, la espada perdería su daño y el peto su armadura |
 | `item_name` | El nombre traducible de vanilla + el sufijo, del color de la rareza. En `item_name` y no `custom_name`: no sale en cursiva ni como "renombrado", y un yunque igual lo puede renombrar |
 | `lore` | "Rareza: épica", "Nivel 57" y una línea por cada afijo que no es atributo (los atributos los muestra vanilla) |
@@ -72,7 +72,7 @@ Todo en **componentes de vanilla**: un cliente sin el mod lo ve entero, y el obj
 
 ## Config
 
-`config/botinmitico.json`, leído como en Bloodmoon (`ArchivoDeConfiguracion`): se mezcla sobre `POR_DEFECTO` clave por clave (también dentro de los mapas), se valida y se reescribe completo; un archivo con error se rechaza sin tocarlo y sigue la config anterior. `/botinmitico recargar` lo vuelve a leer. **Los mapas (`rarezas`, `pesosDeTipo`, `valoresMaximos`) van por id**: una clave mal escrita es un `warn` y se ignora.
+`config/mythicloot.json`, leído como en Bloodmoon (`ArchivoDeConfiguracion`): se mezcla sobre `POR_DEFECTO` clave por clave (también dentro de los mapas), se valida y se reescribe completo; un archivo con error se rechaza sin tocarlo y sigue la config anterior. `/mythicloot recargar` lo vuelve a leer. **Los mapas (`rarezas`, `pesosDeTipo`, `valoresMaximos`) van por id**: una clave mal escrita es un `warn` y se ignora.
 
 ## Ver también
 

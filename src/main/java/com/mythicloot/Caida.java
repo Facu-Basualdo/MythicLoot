@@ -1,4 +1,4 @@
-package com.botinmitico;
+package com.mythicloot;
 
 import org.jspecify.annotations.Nullable;
 
@@ -56,7 +56,7 @@ public final class Caida {
 		if (jugador == null || !level.getGameRules().get(GameRules.MOB_DROPS)) {
 			return;
 		}
-		Configuracion config = BotinMitico.config();
+		Configuracion config = MythicLoot.config();
 		RandomSource random = mob.getRandom();
 		Rareza rareza = sortear(mob, config, random);
 		if (rareza == null) {

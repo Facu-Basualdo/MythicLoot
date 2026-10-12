@@ -1,4 +1,4 @@
-package com.botinmitico.test;
+package com.mythicloot.test;
 
 import com.mojang.serialization.Codec;
 
@@ -23,6 +23,6 @@ public class AttachmentsDeBloodmoon implements ModInitializer {
 	}
 
 	private static Identifier id(String path) {
-		return Identifier.fromNamespaceAndPath("mobspoderosos", path);
+		return Identifier.fromNamespaceAndPath("bloodmoonandbosses", path);
 	}
 }
