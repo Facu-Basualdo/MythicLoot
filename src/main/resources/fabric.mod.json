@@ -1,0 +1,29 @@
+{
+	"schemaVersion": 1,
+	"id": "botinmitico",
+	"version": "${version}",
+	"name": "Mythic Loot",
+	"description": "Los mobs hostiles que matás pueden soltar armas, arcos y armaduras con rareza y afijos al azar: más daño, robo de vida, flechas certeras, más vida… Cuanto más nivel tiene el mob, mejor. Pensado para jugarse con Bloodmoon & Bosses y Hero's Forge.",
+	"authors": [
+		"FacuBas"
+	],
+	"license": "MIT",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"com.botinmitico.BotinMitico"
+		]
+	},
+	"mixins": [
+		"botinmitico.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.19.5",
+		"minecraft": "~26.3",
+		"java": ">=25",
+		"fabric-api": "*"
+	},
+	"suggests": {
+		"mobspoderosos": "*"
+	}
+}
