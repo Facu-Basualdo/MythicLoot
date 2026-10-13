@@ -19,29 +19,48 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
  * <p>El id es para siempre: va en el {@code custom_data} de cada objeto que ya se soltó.
  */
 public enum AfijoDeBotin {
-	AFILADO("afilado", EnumSet.of(TipoDeObjeto.CUERPO_A_CUERPO), Attributes.ATTACK_DAMAGE, AttributeModifier.Operation.ADD_VALUE, null),
+	AFILADO("afilado", EnumSet.of(TipoDeObjeto.CUERPO_A_CUERPO, TipoDeObjeto.TRIDENTE), Attributes.ATTACK_DAMAGE, AttributeModifier.Operation.ADD_VALUE, null),
 	// Se multiplica sobre la base más el arma, como la velocidad de ataque de Hero's Forge
-	FURIOSO("furioso", EnumSet.of(TipoDeObjeto.CUERPO_A_CUERPO), Attributes.ATTACK_SPEED, AttributeModifier.Operation.ADD_MULTIPLIED_BASE, null),
-	LARGO("largo", EnumSet.of(TipoDeObjeto.CUERPO_A_CUERPO), Attributes.ENTITY_INTERACTION_RANGE, AttributeModifier.Operation.ADD_VALUE, null),
-	VAMPIRICO("vampirico", EnumSet.of(TipoDeObjeto.CUERPO_A_CUERPO, TipoDeObjeto.A_DISTANCIA), null, null,
+	FURIOSO("furioso", EnumSet.of(TipoDeObjeto.CUERPO_A_CUERPO, TipoDeObjeto.TRIDENTE), Attributes.ATTACK_SPEED, AttributeModifier.Operation.ADD_MULTIPLIED_BASE, null),
+	LARGO("largo", EnumSet.of(TipoDeObjeto.CUERPO_A_CUERPO, TipoDeObjeto.TRIDENTE), Attributes.ENTITY_INTERACTION_RANGE, AttributeModifier.Operation.ADD_VALUE, null),
+	VAMPIRICO("vampirico", EnumSet.of(TipoDeObjeto.CUERPO_A_CUERPO, TipoDeObjeto.A_DISTANCIA, TipoDeObjeto.TRIDENTE), null, null,
 			valor -> Idioma.guardado("mythicloot.afijo.vampirico.descripcion", Texto.numero(valor * 100))),
-	ARDIENTE("ardiente", EnumSet.of(TipoDeObjeto.CUERPO_A_CUERPO, TipoDeObjeto.A_DISTANCIA), null, null,
+	ARDIENTE("ardiente", EnumSet.of(TipoDeObjeto.CUERPO_A_CUERPO, TipoDeObjeto.A_DISTANCIA, TipoDeObjeto.TRIDENTE), null, null,
 			valor -> valor == 1 ? Idioma.guardado("mythicloot.afijo.ardiente.descripcion.uno")
 					: Idioma.guardado("mythicloot.afijo.ardiente.descripcion.varios", Texto.numero(valor))),
-	CERTERO("certero", EnumSet.of(TipoDeObjeto.A_DISTANCIA), null, null,
+	CERTERO("certero", EnumSet.of(TipoDeObjeto.A_DISTANCIA, TipoDeObjeto.TRIDENTE), null, null,
 			valor -> Idioma.guardado("mythicloot.afijo.certero.descripcion", Texto.numero(valor * 100))),
-	LIGERO("ligero", EnumSet.of(TipoDeObjeto.A_DISTANCIA, TipoDeObjeto.ARMADURA), Attributes.MOVEMENT_SPEED, AttributeModifier.Operation.ADD_MULTIPLIED_BASE, null),
-	ROBUSTO("robusto", EnumSet.of(TipoDeObjeto.ARMADURA), Attributes.MAX_HEALTH, AttributeModifier.Operation.ADD_VALUE, null),
-	REFORZADO("reforzado", EnumSet.of(TipoDeObjeto.ARMADURA), Attributes.ARMOR, AttributeModifier.Operation.ADD_VALUE, null),
-	TENAZ("tenaz", EnumSet.of(TipoDeObjeto.ARMADURA), Attributes.ARMOR_TOUGHNESS, AttributeModifier.Operation.ADD_VALUE, null),
-	FIRME("firme", EnumSet.of(TipoDeObjeto.ARMADURA), Attributes.KNOCKBACK_RESISTANCE, AttributeModifier.Operation.ADD_VALUE, null),
-	AFORTUNADO("afortunado", EnumSet.of(TipoDeObjeto.ARMADURA), Attributes.LUCK, AttributeModifier.Operation.ADD_VALUE, null);
+	LIGERO("ligero", EnumSet.of(TipoDeObjeto.A_DISTANCIA, TipoDeObjeto.ARMADURA, TipoDeObjeto.HERRAMIENTA), Attributes.MOVEMENT_SPEED, AttributeModifier.Operation.ADD_MULTIPLIED_BASE, null),
+	// Los de armadura también van en el escudo: valen con el escudo en la mano secundaria
+	ROBUSTO("robusto", EnumSet.of(TipoDeObjeto.ARMADURA, TipoDeObjeto.ESCUDO), Attributes.MAX_HEALTH, AttributeModifier.Operation.ADD_VALUE, null),
+	REFORZADO("reforzado", EnumSet.of(TipoDeObjeto.ARMADURA, TipoDeObjeto.ESCUDO), Attributes.ARMOR, AttributeModifier.Operation.ADD_VALUE, null),
+	TENAZ("tenaz", EnumSet.of(TipoDeObjeto.ARMADURA, TipoDeObjeto.ESCUDO), Attributes.ARMOR_TOUGHNESS, AttributeModifier.Operation.ADD_VALUE, null),
+	FIRME("firme", EnumSet.of(TipoDeObjeto.ARMADURA, TipoDeObjeto.ESCUDO), Attributes.KNOCKBACK_RESISTANCE, AttributeModifier.Operation.ADD_VALUE, null),
+	AFORTUNADO("afortunado", EnumSet.of(TipoDeObjeto.ARMADURA, TipoDeObjeto.ESCUDO), Attributes.LUCK, AttributeModifier.Operation.ADD_VALUE, null),
+	// Como Eficiencia: sólo cuenta con la herramienta que corresponde al bloque
+	EFICIENTE("eficiente", EnumSet.of(TipoDeObjeto.HERRAMIENTA), Attributes.MINING_EFFICIENCY, AttributeModifier.Operation.ADD_VALUE, null),
+	AMPLIO("amplio", EnumSet.of(TipoDeObjeto.HERRAMIENTA), Attributes.BLOCK_INTERACTION_RANGE, AttributeModifier.Operation.ADD_VALUE, null),
+	// La base es 0,2: con 0,8 más mina bajo el agua como con Afinidad acuática
+	SUBMARINO("submarino", EnumSet.of(TipoDeObjeto.HERRAMIENTA), Attributes.SUBMERGED_MINING_SPEED, AttributeModifier.Operation.ADD_VALUE, null),
+
+	// De jefe: sólo los suelta el jefe de zona de Bloodmoon que corresponde (ver Configuracion.AfijosDeJefe), en
+	// cualquier tipo de objeto, y valen mientras el objeto está equipado en su lugar (ver EfectosDeJefe)
+	FESTIN("festin", valor -> Idioma.guardado("mythicloot.afijo.festin.descripcion", Texto.numero(valor * 100))),
+	LLUVIA("lluvia", valor -> Idioma.guardado("mythicloot.afijo.lluvia.descripcion", Texto.numero(valor * 100))),
+	VERDUGO("verdugo", valor -> Idioma.guardado("mythicloot.afijo.verdugo.descripcion", Texto.numero(valor * 100))),
+	BREBAJE("brebaje", valor -> Idioma.guardado("mythicloot.afijo.brebaje.descripcion", Texto.numero(valor * 100))),
+	MARCHITO("marchito", valor -> valor == 1 ? Idioma.guardado("mythicloot.afijo.marchito.descripcion.uno")
+			: Idioma.guardado("mythicloot.afijo.marchito.descripcion.varios", Texto.numero(valor))),
+	BRUTO("bruto", valor -> Idioma.guardado("mythicloot.afijo.bruto.descripcion", Texto.numero(valor * 100))),
+	LLAMARADA("llamarada", valor -> Idioma.guardado("mythicloot.afijo.llamarada.descripcion", Texto.numero(valor * 100))),
+	VACIO("vacio", valor -> Idioma.guardado("mythicloot.afijo.vacio.descripcion", Texto.numero(valor * 100)));
 
 	private final String id;
 	private final Set<TipoDeObjeto> tipos;
 	private final @Nullable Holder<Attribute> atributo;
 	private final AttributeModifier.@Nullable Operation operacion;
 	private final @Nullable DoubleFunction<Component> descripcion;
+	private final boolean deJefe;
 
 	AfijoDeBotin(String id, Set<TipoDeObjeto> tipos, @Nullable Holder<Attribute> atributo,
 			AttributeModifier.@Nullable Operation operacion, @Nullable DoubleFunction<Component> descripcion) {
@@ -50,6 +69,17 @@ public enum AfijoDeBotin {
 		this.atributo = atributo;
 		this.operacion = operacion;
 		this.descripcion = descripcion;
+		this.deJefe = false;
+	}
+
+	/** Uno de jefe: no sale en el sorteo de ningún tipo, no es un atributo y no ocupa lugar entre los de la rareza. */
+	AfijoDeBotin(String id, DoubleFunction<Component> descripcion) {
+		this.id = id;
+		this.tipos = EnumSet.noneOf(TipoDeObjeto.class);
+		this.atributo = null;
+		this.operacion = null;
+		this.descripcion = descripcion;
+		this.deJefe = true;
 	}
 
 	public String id() {
@@ -66,6 +96,15 @@ public enum AfijoDeBotin {
 
 	public boolean sirvePara(TipoDeObjeto tipo) {
 		return tipos.contains(tipo);
+	}
+
+	public boolean deJefe() {
+		return deJefe;
+	}
+
+	/** Los que se miden en segundos enteros (el fuego, el marchitamiento); el resto son fracciones. */
+	public boolean enSegundos() {
+		return this == ARDIENTE || this == MARCHITO;
 	}
 
 	/** Null si no es un atributo: entonces lo aplica {@link Efectos} y va en el lore. */

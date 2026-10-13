@@ -19,21 +19,25 @@ import com.mythicloot.ArchivoDeConfiguracion;
 import com.mythicloot.MythicLoot;
 import com.mythicloot.Caida;
 import com.mythicloot.Configuracion;
+import com.mythicloot.EfectosDeJefe;
 import com.mythicloot.GeneradorDeBotin;
 import com.mythicloot.Idioma;
 import com.mythicloot.NivelDelMob;
 import com.mythicloot.ObjetoConAfijos;
 import com.mythicloot.Rareza;
 import com.mythicloot.TipoDeObjeto;
+import com.mythicloot.Yunque;
 import com.mythicloot.mixin.FlechaAccessor;
 
 import net.fabricmc.fabric.api.gametest.v1.GameTest;
 
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.Connection;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextColor;
 import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.network.protocol.PacketFlow;
 import net.minecraft.server.level.ServerLevel;
@@ -42,12 +46,18 @@ import net.minecraft.server.network.CommonListenerCookie;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityTypes;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.EquipmentSlotGroup;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.animal.golem.IronGolem;
 import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.monster.Witch;
 import net.minecraft.world.entity.monster.zombie.Zombie;
+import net.minecraft.world.entity.projectile.arrow.AbstractArrow;
 import net.minecraft.world.entity.projectile.arrow.Arrow;
+import net.minecraft.world.entity.projectile.arrow.ThrownTrident;
 import net.minecraft.world.inventory.AnvilMenu;
 import net.minecraft.world.inventory.ContainerLevelAccess;
 import net.minecraft.world.item.ItemStack;
@@ -112,7 +122,7 @@ public class MythicLootGameTest {
 						assertCerca(helper, suma(modificadores, afijo) - suma(deVanilla, afijo), entrada.getValue(), que + ": " + afijo + " suma su valor en attribute_modifiers");
 					}
 				}
-				if (tipo == TipoDeObjeto.CUERPO_A_CUERPO) {
+				if (tipo == TipoDeObjeto.CUERPO_A_CUERPO || tipo == TipoDeObjeto.TRIDENTE) {
 					boolean danioDeVanilla = modificadores.modifiers().stream().anyMatch(m -> m.attribute().equals(Attributes.ATTACK_DAMAGE)
 							&& !m.modifier().id().getNamespace().equals(MythicLoot.MOD_ID));
 					helper.assertTrue(danioDeVanilla, Component.literal(que + ": el arma conserva su daño de vanilla"));
@@ -139,7 +149,7 @@ public class MythicLootGameTest {
 		Configuracion config = Configuracion.POR_DEFECTO;
 		RandomSource random = RandomSource.create(3);
 		ItemStack bajo = GeneradorDeBotin.generar(config, 5, Rareza.MAGICA, TipoDeObjeto.CUERPO_A_CUERPO, random);
-		helper.assertTrue(bajo.is(Items.COPPER_SWORD) || bajo.is(Items.COPPER_AXE), Component.literal("En el nivel 5, de cobre: " + bajo.getItem()));
+		helper.assertTrue(bajo.getItem().toString().contains("copper"), Component.literal("En el nivel 5, de cobre: " + bajo.getItem()));
 		for (int i = 0; i < 10; i++) {
 			ItemStack epica = GeneradorDeBotin.generar(config, 90, Rareza.EPICA, TipoDeObjeto.ARMADURA, random);
 			helper.assertTrue(epica.getItem().toString().contains("diamond"), Component.literal("Una épica de nivel 90 es de diamante: " + epica.getItem()));
@@ -155,6 +165,237 @@ public class MythicLootGameTest {
 			helper.assertTrue(GeneradorDeBotin.elegirRareza(config, 90, Rareza.EPICA, random).compareTo(Rareza.EPICA) >= 0,
 					Component.literal("Un jefe nunca da menos que la mínima"));
 		}
+		helper.succeed();
+	}
+
+	@GameTest
+	public void lanzasMazasTridentesEscudosYHerramientas(GameTestHelper helper) {
+		Configuracion config = Configuracion.POR_DEFECTO;
+		RandomSource random = RandomSource.create(5);
+		boolean lanza = false;
+		boolean maza = false;
+		for (int i = 0; i < 200; i++) {
+			ItemStack magica = GeneradorDeBotin.generar(config, 60, Rareza.MAGICA, TipoDeObjeto.CUERPO_A_CUERPO, random);
+			helper.assertFalse(magica.is(Items.MACE), Component.literal("Una mágica nunca es maza"));
+			lanza |= magica.is(Items.DIAMOND_SPEAR);
+			maza |= GeneradorDeBotin.generar(config, 60, Rareza.EPICA, TipoDeObjeto.CUERPO_A_CUERPO, random).is(Items.MACE);
+		}
+		helper.assertTrue(lanza, Component.literal("En el nivel 60 salen lanzas de diamante"));
+		helper.assertTrue(maza, Component.literal("Desde épica, también mazas"));
+
+		ItemStack herramienta = GeneradorDeBotin.generar(config, 5, Rareza.MAGICA, TipoDeObjeto.HERRAMIENTA, random);
+		helper.assertTrue(herramienta.is(Items.COPPER_PICKAXE) || herramienta.is(Items.COPPER_SHOVEL), Component.literal("En el nivel 5, pico o pala de cobre: " + herramienta.getItem()));
+		helper.assertTrue(GeneradorDeBotin.generar(config, 5, Rareza.MAGICA, TipoDeObjeto.TRIDENTE, random).is(Items.TRIDENT), Component.literal("Tridente"));
+
+		ItemStack escudo = GeneradorDeBotin.generar(config, 60, Rareza.LEGENDARIA, TipoDeObjeto.ESCUDO, random);
+		helper.assertTrue(escudo.is(Items.SHIELD), Component.literal("Escudo"));
+		helper.assertTrue(escudo.get(DataComponents.ATTRIBUTE_MODIFIERS).modifiers().stream().allMatch(m -> m.slot() == EquipmentSlotGroup.OFFHAND),
+				Component.literal("Los afijos del escudo valen en la mano secundaria"));
+		helper.succeed();
+	}
+
+	@GameTest
+	public void elEscudoValeEnLaManoSecundaria(GameTestHelper helper) {
+		Zombie conEscudo = helper.spawn(EntityTypes.ZOMBIE, DENTRO);
+		Zombie enLaPrincipal = helper.spawn(EntityTypes.ZOMBIE, DENTRO.east(2));
+		double vida = conEscudo.getAttributeValue(Attributes.MAX_HEALTH);
+		conEscudo.setItemSlot(EquipmentSlot.OFFHAND, conAfijo(new ItemStack(Items.SHIELD), AfijoDeBotin.ROBUSTO, 4));
+		enLaPrincipal.setItemSlot(EquipmentSlot.MAINHAND, conAfijo(new ItemStack(Items.SHIELD), AfijoDeBotin.ROBUSTO, 4));
+		helper.runAfterDelay(2, () -> {
+			assertCerca(helper, conEscudo.getAttributeValue(Attributes.MAX_HEALTH), vida + 4, "Con el escudo en la mano secundaria");
+			assertCerca(helper, enLaPrincipal.getAttributeValue(Attributes.MAX_HEALTH), vida, "En la principal, no");
+			conEscudo.discard();
+			enLaPrincipal.discard();
+			helper.succeed();
+		});
+	}
+
+	/** El tridente lanzado pega un 8 fijo: el certero entra por el mixin, y el fuego no lo pasa vanilla. */
+	@GameTest
+	public void tridenteLanzado(GameTestHelper helper) {
+		ServerLevel level = helper.getLevel();
+		ServerPlayer jugador = entrar(helper, "pescador");
+		ItemStack tridente = new ItemStack(Items.TRIDENT);
+		Map<AfijoDeBotin, Double> afijos = new EnumMap<>(AfijoDeBotin.class);
+		afijos.put(AfijoDeBotin.CERTERO, 0.5);
+		afijos.put(AfijoDeBotin.VAMPIRICO, 0.1);
+		afijos.put(AfijoDeBotin.ARDIENTE, 2.0);
+		GeneradorDeBotin.armar(tridente, new ObjetoConAfijos(50, Rareza.RARA, afijos), AfijoDeBotin.CERTERO);
+		jugador.setHealth(10);
+
+		IronGolem blanco = helper.spawnWithNoFreeWill(EntityTypes.IRON_GOLEM, DENTRO);
+		// Que el fuego no le saque vida: así se mide sólo el golpe
+		blanco.addEffect(new MobEffectInstance(MobEffects.FIRE_RESISTANCE, 200));
+		float vida = blanco.getHealth();
+		ThrownTrident lanzado = new ThrownTrident(level, jugador, tridente);
+		lanzado.setPos(blanco.position().add(0, 1, -1.5));
+		lanzado.setDeltaMovement(0, 0, 1);
+		level.addFreshEntity(lanzado);
+		helper.succeedWhen(() -> {
+			helper.assertTrue(blanco.getHealth() < vida, Component.literal("El tridente le pegó"));
+			assertCerca(helper, vida - blanco.getHealth(), 12, "8 de vanilla y un 50 % más");
+			assertCerca(helper, jugador.getHealth(), 11.2, "El vampírico cura el 10 % del golpe");
+			helper.assertTrue(blanco.getRemainingFireTicks() > 0, Component.literal("El ardiente lo prende fuego"));
+			lanzado.discard();
+			blanco.discard();
+			salir(helper, jugador);
+		});
+	}
+
+	@GameTest
+	public void elAfijoDeJefeVaAparte(GameTestHelper helper) {
+		ItemStack stack = GeneradorDeBotin.generar(Configuracion.POR_DEFECTO, 60, Rareza.EPICA, TipoDeObjeto.ARMADURA, AfijoDeBotin.VACIO, RandomSource.create(9));
+		ObjetoConAfijos objeto = ObjetoConAfijos.de(stack);
+		helper.assertValueEqual(objeto.afijos().size(), 4, "Los 3 de la épica más el de jefe");
+		helper.assertTrue(objeto.valor(AfijoDeBotin.VACIO) > 0, Component.literal("El de jefe vale algo"));
+		helper.assertTrue(stack.getHoverName().getString().endsWith(AfijoDeBotin.VACIO.sufijo().getString()), Component.literal("Y da el nombre: " + stack.getHoverName().getString()));
+		helper.assertTrue(stack.get(DataComponents.LORE).lines().stream().anyMatch(l -> TextColor.fromLegacyFormat(ChatFormatting.RED).equals(l.getStyle().getColor())),
+				Component.literal("Su línea del lore va en rojo"));
+
+		Map<AfijoDeBotin, Double> legendaria = new EnumMap<>(AfijoDeBotin.class);
+		legendaria.put(AfijoDeBotin.AFILADO, 1.0);
+		legendaria.put(AfijoDeBotin.FURIOSO, 0.1);
+		legendaria.put(AfijoDeBotin.LARGO, 0.5);
+		legendaria.put(AfijoDeBotin.VAMPIRICO, 0.05);
+		ObjetoConAfijos unido = Yunque.juntar(new ObjetoConAfijos(50, Rareza.LEGENDARIA, legendaria), new ObjetoConAfijos(50, Rareza.MAGICA, Map.of(AfijoDeBotin.VERDUGO, 0.2)));
+		helper.assertValueEqual(unido.afijos().size(), 5, "Una legendaria de 4 gana el de jefe: no cuenta para el tope");
+		helper.assertValueEqual(unido.rareza(), Rareza.LEGENDARIA, "Sigue legendaria");
+
+		ObjetoConAfijos dos = Yunque.juntar(new ObjetoConAfijos(50, Rareza.MAGICA, Map.of(AfijoDeBotin.AFILADO, 1.0, AfijoDeBotin.VERDUGO, 0.2)),
+				new ObjetoConAfijos(50, Rareza.MAGICA, Map.of(AfijoDeBotin.FURIOSO, 0.1, AfijoDeBotin.VACIO, 0.1)));
+		helper.assertValueEqual(dos.afijos().keySet(), Set.of(AfijoDeBotin.AFILADO, AfijoDeBotin.FURIOSO, AfijoDeBotin.VERDUGO), "Con dos de jefe distintos, queda el de la izquierda");
+		helper.assertValueEqual(dos.rareza(), Rareza.RARA, "Y la rareza cuenta sólo los comunes");
+		helper.succeed();
+	}
+
+	/** Cambia el modo Bloodmoon, que es global: todo pasa adentro del método y se restaura en el finally. */
+	@GameTest
+	public void sorteoDelAfijoDeJefe(GameTestHelper helper) {
+		RandomSource random = RandomSource.create(13);
+		Zombie zombi = helper.spawn(EntityTypes.ZOMBIE, DENTRO);
+		zombi.setAttached(AttachmentsDeBloodmoon.NIVEL, 50);
+		Witch bruja = helper.spawn(EntityTypes.WITCH, DENTRO);
+		bruja.setAttached(AttachmentsDeBloodmoon.NIVEL, 50);
+		bruja.setAttached(AttachmentsDeBloodmoon.JEFE, true);
+		boolean antes = NivelDelMob.conBloodmoon();
+		NivelDelMob.usarBloodmoon(true);
+		try {
+			helper.assertTrue(Caida.afijoDeJefe(zombi, conAfijosDeJefe(1), random) == null, Component.literal("Un mob que no es jefe no trae"));
+			zombi.setAttached(AttachmentsDeBloodmoon.JEFE, true);
+			helper.assertValueEqual(Caida.afijoDeJefe(zombi, conAfijosDeJefe(1), random), AfijoDeBotin.FESTIN, "El jefe zombi trae el festín");
+			helper.assertValueEqual(Caida.afijoDeJefe(bruja, conAfijosDeJefe(1), random), AfijoDeBotin.BREBAJE, "La jefa bruja, el brebaje");
+			helper.assertTrue(Caida.afijoDeJefe(zombi, conAfijosDeJefe(0), random) == null, Component.literal("Con chance 0, ninguno"));
+		} finally {
+			NivelDelMob.usarBloodmoon(antes);
+		}
+		zombi.discard();
+		bruja.discard();
+		helper.succeed();
+	}
+
+	@GameTest
+	public void festinYMarchitoAlPegarYAlMatar(GameTestHelper helper) {
+		ServerLevel level = helper.getLevel();
+		ServerPlayer jugador = entrar(helper, "glotona");
+		jugador.setItemSlot(EquipmentSlot.HEAD, conAfijos(new ItemStack(Items.IRON_HELMET), Rareza.MAGICA, Map.of(AfijoDeBotin.FESTIN, 0.1)));
+		jugador.setItemSlot(EquipmentSlot.MAINHAND, conAfijos(new ItemStack(Items.IRON_SWORD), Rareza.MAGICA, Map.of(AfijoDeBotin.MARCHITO, 3.0)));
+		jugador.setHealth(10);
+
+		Zombie presa = helper.spawn(EntityTypes.ZOMBIE, DENTRO);
+		presa.hurtServer(level, jugador.damageSources().playerAttack(jugador), 10_000);
+		assertCerca(helper, jugador.getHealth(), 12, "Matar un zombi con un casco del Festín de 0,1 cura 2 (de 20)");
+		contarObjetos(helper, presa);
+
+		IronGolem blanco = helper.spawnWithNoFreeWill(EntityTypes.IRON_GOLEM, DENTRO.east(2));
+		blanco.hurtServer(level, jugador.damageSources().playerAttack(jugador), 5);
+		helper.assertTrue(blanco.hasEffect(MobEffects.WITHER), Component.literal("La espada del Marchitamiento marchita"));
+		helper.assertValueEqual(blanco.getEffect(MobEffects.WITHER).getAmplifier(), 1, "Wither II");
+
+		// En la mochila no vale: tiene que estar equipado en su lugar
+		jugador.setItemSlot(EquipmentSlot.HEAD, ItemStack.EMPTY);
+		jugador.getInventory().add(conAfijos(new ItemStack(Items.IRON_HELMET), Rareza.MAGICA, Map.of(AfijoDeBotin.FESTIN, 0.1)));
+		helper.assertValueEqual(EfectosDeJefe.valor(jugador, AfijoDeBotin.FESTIN), 0.0, "Un casco en el inventario no cuenta");
+		jugador.setItemSlot(EquipmentSlot.MAINHAND, conAfijos(new ItemStack(Items.IRON_HELMET), Rareza.MAGICA, Map.of(AfijoDeBotin.FESTIN, 0.1)));
+		helper.assertValueEqual(EfectosDeJefe.valor(jugador, AfijoDeBotin.FESTIN), 0.0, "Ni un casco en la mano");
+
+		blanco.discard();
+		salir(helper, jugador);
+		helper.succeed();
+	}
+
+	/** Pasa por el mixin de getDamageAfterArmorAbsorb: un zombi con pechera de diamante, con y sin verdugo. */
+	@GameTest
+	public void verdugoIgnoraLaArmadura(GameTestHelper helper) {
+		ServerLevel level = helper.getLevel();
+		ServerPlayer jugador = entrar(helper, "hacha");
+		Zombie comun = helper.spawn(EntityTypes.ZOMBIE, DENTRO);
+		Zombie verdugo = helper.spawn(EntityTypes.ZOMBIE, DENTRO.east(2));
+		comun.setItemSlot(EquipmentSlot.CHEST, new ItemStack(Items.DIAMOND_CHESTPLATE));
+		verdugo.setItemSlot(EquipmentSlot.CHEST, new ItemStack(Items.DIAMOND_CHESTPLATE));
+		helper.runAfterDelay(2, () -> {
+			jugador.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(Items.IRON_SWORD));
+			comun.hurtServer(level, jugador.damageSources().playerAttack(jugador), 10);
+			jugador.setItemSlot(EquipmentSlot.MAINHAND, conAfijos(new ItemStack(Items.IRON_SWORD), Rareza.MAGICA, Map.of(AfijoDeBotin.VERDUGO, 1.0)));
+			verdugo.hurtServer(level, jugador.damageSources().playerAttack(jugador), 10);
+			helper.assertTrue(comun.getHealth() > 10, Component.literal("Sin verdugo, la armadura baja el golpe: quedó con " + comun.getHealth()));
+			assertCerca(helper, 20 - verdugo.getHealth(), 10, "Con verdugo 1, el golpe entra entero");
+			comun.discard();
+			verdugo.discard();
+			salir(helper, jugador);
+			helper.succeed();
+		});
+	}
+
+	/** Los jugadores de prueba no reciben daño (su cliente nunca "cargó"): se llama a cada efecto directo. */
+	@GameTest
+	public void brutoLlamaradaBrebajeYVacio(GameTestHelper helper) {
+		ServerLevel level = helper.getLevel();
+		ServerPlayer jugador = entrar(helper, "tanque");
+		Zombie atacante = helper.spawn(EntityTypes.ZOMBIE, DENTRO);
+		jugador.setItemSlot(EquipmentSlot.HEAD, conAfijos(new ItemStack(Items.IRON_HELMET), Rareza.MAGICA, Map.of(AfijoDeBotin.BRUTO, 0.5)));
+		jugador.setItemSlot(EquipmentSlot.CHEST, conAfijos(new ItemStack(Items.IRON_CHESTPLATE), Rareza.MAGICA, Map.of(AfijoDeBotin.LLAMARADA, 0.5, AfijoDeBotin.BREBAJE, 1.0)));
+		jugador.setItemSlot(EquipmentSlot.OFFHAND, conAfijos(new ItemStack(Items.SHIELD), Rareza.MAGICA, Map.of(AfijoDeBotin.VACIO, 1.0)));
+
+		assertCerca(helper, EfectosDeJefe.danioRecibido(jugador, jugador.damageSources().mobAttack(atacante), 10), 5, "Bruto 0,5: la mitad de un golpe cuerpo a cuerpo");
+		assertCerca(helper, EfectosDeJefe.danioRecibido(jugador, jugador.damageSources().inFire(), 10), 5, "Llamarada 0,5: la mitad del fuego");
+		assertCerca(helper, EfectosDeJefe.danioRecibido(jugador, jugador.damageSources().fall(), 10), 10, "Una caída, entera");
+
+		jugador.setHealth(10);
+		EfectosDeJefe.alPegar(jugador, jugador.damageSources().mobAttack(atacante), 2, 2, false);
+		assertCerca(helper, jugador.getHealth(), 14, "Brebaje 1: toma curación instantánea (2 corazones)");
+		helper.assertTrue(atacante.getRemainingFireTicks() > 0, Component.literal("La llamarada prende al que le pegó"));
+		EfectosDeJefe.alPegar(jugador, jugador.damageSources().mobAttack(atacante), 2, 2, false);
+		assertCerca(helper, jugador.getHealth(), 14, "Hasta que pase la espera, no toma otro");
+
+		// Los jugadores de prueba entran en (0, 0, 0): para saltar necesita suelo cerca
+		Vec3 suelo = helper.absoluteVec(Vec3.atBottomCenterOf(DENTRO));
+		jugador.teleportTo(suelo.x, suelo.y, suelo.z);
+		Vec3 antes = jugador.position();
+		helper.assertTrue(EfectosDeJefe.esquivar(jugador, jugador.damageSources().fall(), 5), Component.literal("Una caída no se esquiva"));
+		helper.assertFalse(EfectosDeJefe.esquivar(jugador, jugador.damageSources().mobAttack(atacante), 5), Component.literal("Vacío 1 esquiva el golpe de un mob"));
+		helper.assertTrue(jugador.position().distanceTo(antes) > 0, Component.literal("Saltando a otro lugar"));
+		helper.assertTrue(EfectosDeJefe.esquivar(jugador, jugador.damageSources().mobAttack(atacante), 5), Component.literal("Y hasta que pase la espera, no esquiva otro"));
+
+		atacante.discard();
+		salir(helper, jugador);
+		helper.succeed();
+	}
+
+	@GameTest
+	public void lluviaDeFlechas(GameTestHelper helper) {
+		ServerLevel level = helper.getLevel();
+		ServerPlayer jugador = entrar(helper, "lluvia");
+		ItemStack arco = conAfijos(new ItemStack(Items.BOW), Rareza.MAGICA, Map.of(AfijoDeBotin.LLUVIA, 1.0));
+		jugador.setItemSlot(EquipmentSlot.MAINHAND, arco);
+		Arrow flecha = new Arrow(level, jugador, new ItemStack(Items.ARROW), arco);
+		flecha.setPos(helper.absoluteVec(Vec3.atCenterOf(DENTRO)));
+		flecha.setDeltaMovement(0, 0, 1);
+		level.addFreshEntity(flecha);
+		List<Arrow> flechas = level.getEntitiesOfClass(Arrow.class, flecha.getBoundingBox().inflate(2));
+		helper.assertValueEqual(flechas.size(), 2, "Lluvia 1: sale una flecha más");
+		helper.assertTrue(flechas.stream().anyMatch(f -> f != flecha && f.pickup == AbstractArrow.Pickup.CREATIVE_ONLY), Component.literal("Y la copia no se puede juntar"));
+		flechas.forEach(Arrow::discard);
+		salir(helper, jugador);
 		helper.succeed();
 	}
 
@@ -393,7 +634,14 @@ public class MythicLootGameTest {
 			assertCerca(helper, leida.valorMaximo(AfijoDeBotin.VAMPIRICO), Configuracion.POR_DEFECTO.valorMaximo(AfijoDeBotin.VAMPIRICO), "Lo que falta del mapa queda por defecto");
 			helper.assertValueEqual(leida.rareza(Rareza.EPICA), new Configuracion.ChanceDeRareza(50, 0), "Y lo que falta dentro de una rareza");
 
-			for (String invalido : List.of("{\"chanceMaxima\": 2}", "{\"rarezaDeJefe\": \"divina\"}", "{\"valoresMaximos\": {\"certero\": 0}}")) {
+			Path jefes = carpeta.resolve("jefes.json");
+			Files.writeString(jefes, "{\"afijosDeJefe\": {\"porMob\": {\"minecraft:husk\": \"festin\", \"minecraft:zombie\": \"\"}}}");
+			Configuracion conJefes = ArchivoDeConfiguracion.leer(jefes);
+			helper.assertValueEqual(conJefes.afijoDeJefe("minecraft:husk"), AfijoDeBotin.FESTIN, "Se pueden sumar especies de jefe");
+			helper.assertTrue(conJefes.afijoDeJefe("minecraft:zombie") == null, Component.literal("\"\" saca el afijo de una especie"));
+			helper.assertValueEqual(conJefes.afijoDeJefe("minecraft:witch"), AfijoDeBotin.BREBAJE, "Las otras quedan por defecto");
+
+			for (String invalido : List.of("{\"afijosDeJefe\": {\"porMob\": {\"minecraft:zombie\": \"afilado\"}}}", "{\"afijosDeJefe\": {\"chance\": 2}}", "{\"chanceMaxima\": 2}", "{\"rarezaDeJefe\": \"divina\"}", "{\"rarezaMinimaDeMaza\": \"divina\"}", "{\"valoresMaximos\": {\"certero\": 0}}")) {
 				Path archivo = carpeta.resolve("invalido.json");
 				Files.writeString(archivo, invalido);
 				boolean lanzo;
@@ -423,10 +671,25 @@ public class MythicLootGameTest {
 				.mapToDouble(m -> m.modifier().amount()).sum();
 	}
 
+	private static Configuracion conAfijosDeJefe(double chance) {
+		Configuracion c = Configuracion.POR_DEFECTO;
+		Configuracion.AfijosDeJefe a = c.afijosDeJefe();
+		return new Configuracion(c.nivelMaximo(), c.bloquesPorNivel(), c.extraNether(), c.extraEnd(), c.chanceBase(), c.chancePorNivel(), c.chanceMaxima(),
+				c.multiplicadorCampeon(), c.botinDeJefe(), c.rarezaDeJefe(),
+				new Configuracion.AfijosDeJefe(chance, a.porMob(), a.nivelDeMarchito(), a.segundosDeBrebaje(), a.segundosEntreBrebajes(), a.segundosDeLlamarada(),
+						a.segundosEntreTeletransportes(), a.distanciaDeTeletransporte()),
+				c.rarezas(), c.pesosDeTipo(), c.nivelesPorMaterial(), c.netheritaSoloLegendaria(), c.rarezaMinimaDeMaza(), c.valoresMaximos(),
+				c.costoPorAfijoUnido(), c.idioma());
+	}
+
+	private static ItemStack conAfijos(ItemStack stack, Rareza rareza, Map<AfijoDeBotin, Double> afijos) {
+		return GeneradorDeBotin.armar(stack, new ObjetoConAfijos(50, rareza, afijos), null);
+	}
+
 	private static Configuracion conChance(double chance) {
 		Configuracion c = Configuracion.POR_DEFECTO;
 		return new Configuracion(c.nivelMaximo(), c.bloquesPorNivel(), c.extraNether(), c.extraEnd(), chance, 0, chance, c.multiplicadorCampeon(),
-				c.botinDeJefe(), c.rarezaDeJefe(), c.rarezas(), c.pesosDeTipo(), c.nivelesPorMaterial(), c.netheritaSoloLegendaria(), c.valoresMaximos(),
+				c.botinDeJefe(), c.rarezaDeJefe(), c.afijosDeJefe(), c.rarezas(), c.pesosDeTipo(), c.nivelesPorMaterial(), c.netheritaSoloLegendaria(), c.rarezaMinimaDeMaza(), c.valoresMaximos(),
 				c.costoPorAfijoUnido(), c.idioma());
 	}
 

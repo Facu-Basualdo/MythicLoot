@@ -8,7 +8,10 @@ import net.minecraft.util.StringRepresentable;
 public enum TipoDeObjeto implements StringRepresentable {
 	CUERPO_A_CUERPO("cuerpo_a_cuerpo"),
 	A_DISTANCIA("a_distancia"),
-	ARMADURA("armadura");
+	ARMADURA("armadura"),
+	TRIDENTE("tridente"),
+	ESCUDO("escudo"),
+	HERRAMIENTA("herramienta");
 
 	private final String id;
 

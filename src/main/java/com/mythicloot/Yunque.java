@@ -41,7 +41,8 @@ public final class Yunque {
 	/**
 	 * Los afijos de los dos; si se repite uno, el valor más alto. Nunca más que los de la mejor rareza: si se pasa, se
 	 * quedan los del de la izquierda y los primeros del otro. La rareza sube hasta la que trae esa cantidad de afijos, y
-	 * el nivel es el más alto.
+	 * el nivel es el más alto. El de jefe no cuenta para el tope ni para la rareza, pero hay uno solo: si los dos traen
+	 * uno distinto, queda el del de la izquierda (si no, juntando objetos se apilarían los efectos de varios jefes).
 	 */
 	public static ObjetoConAfijos juntar(@Nullable ObjetoConAfijos izquierda, ObjetoConAfijos derecha) {
 		Map<AfijoDeBotin, Double> afijos = new EnumMap<>(AfijoDeBotin.class);
@@ -53,18 +54,22 @@ public final class Yunque {
 			Double actual = afijos.get(afijo);
 			if (actual != null) {
 				afijos.put(afijo, Math.max(actual, valor));
-			} else if (afijos.size() < tope) {
+			} else if (afijo.deJefe() ? afijos.keySet().stream().noneMatch(AfijoDeBotin::deJefe) : comunes(afijos) < tope) {
 				afijos.put(afijo, valor);
 			}
 		});
 
-		Rareza rareza = Rareza.conAfijos(afijos.size());
+		Rareza rareza = Rareza.conAfijos(comunes(afijos));
 		int nivel = derecha.nivel();
 		if (izquierda != null) {
 			rareza = mejor(rareza, izquierda.rareza());
 			nivel = Math.max(nivel, izquierda.nivel());
 		}
 		return new ObjetoConAfijos(nivel, mejor(rareza, derecha.rareza()), afijos);
+	}
+
+	private static int comunes(Map<AfijoDeBotin, Double> afijos) {
+		return (int) afijos.keySet().stream().filter(afijo -> !afijo.deJefe()).count();
 	}
 
 	private static Rareza mejor(Rareza una, Rareza otra) {

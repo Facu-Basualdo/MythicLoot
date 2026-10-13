@@ -23,6 +23,15 @@ Síntomas que esta nota evita: una granja de spawners llena de legendarias; un m
 
 El objeto cae con `spawnAtLocation`. **Épicas y legendarias quedan brillando** (`setGlowingTag`, el contorno se ve a través de las paredes), con sonido y un "¡Botín épico!" en la barra de acción del que lo mató.
 
+## Afijos de jefe
+
+`Caida.afijoDeJefe(mob, config, random)`: si el mob es jefe (`NivelDelMob.esJefe`) y sale `afijosDeJefe.chance` (0,25), el afijo de su especie: `afijosDeJefe.porMob` por id de `BuiltInRegistries.ENTITY_TYPE` (`"minecraft:zombie"`). Las 8 especies por defecto son las de los tags `jefe_de_zona/*` de Bloodmoon. Bloodmoon sólo guarda que es jefe (un booleano): la especie sale del mob.
+
+- `GeneradorDeBotin.generar(…, deJefe, random)` lo suma **aparte de los de la rareza**, con el mismo `valor`, y le da el nombre al objeto.
+- Al caer: brillo, sonido de desafío y "¡Botín de jefe!" en rojo (en lugar del aviso de la rareza).
+- **`porMob` es la única lista abierta de la config:** `ArchivoDeConfiguracion.mezclar` acepta claves nuevas bajo `afijosDeJefe.porMob.` (un datapack puede sumar especies a los jefes de Bloodmoon). `""` saca el afijo de una especie. `validar` exige un id de entidad que se pueda leer y un afijo de jefe.
+- Los efectos: ver [Afijos](afijos.md#afijos-de-jefe).
+
 ## El nivel (`NivelDelMob`)
 
 | | Nivel | Jefe / campeón |
@@ -43,7 +52,7 @@ El objeto cae con `spawnAtLocation`. **Épicas y legendarias quedan brillando** 
 
 **Material** (`base`): `nivel / nivelesPorMaterial`, tope 4.
 
-| Índice | Nivel (por defecto) | Armas | Armadura |
+| Índice | Nivel (por defecto) | Armas (espada, hacha, lanza) y herramientas (pico, pala) | Armadura |
 |---|---|---|---|
 | 0 | 1–19 | cobre | cobre |
 | 1 | 20–39 | hierro | cadena |
@@ -51,7 +60,10 @@ El objeto cae con `spawnAtLocation`. **Épicas y legendarias quedan brillando** 
 | 3 | 60–79 | diamante | diamante |
 | 4 | 80+ | netherita **sólo si es legendaria** (`netheritaSoloLegendaria`), si no diamante | igual |
 
-A distancia es arco (2 de 3) o ballesta, en cualquier nivel.
+Sin material, en cualquier nivel: a distancia es arco (2 de 3) o ballesta; el tridente, tridente; el escudo, escudo.
+
+- **La maza** (`cuerpoACuerpo`): desde `rarezaMinimaDeMaza` (épica) es una opción más entre las armas del material, con la misma chance que cada una. En vanilla sale de las cámaras de prueba: en una mágica sería regalarla.
+- **Tipos y pesos:** `cuerpo_a_cuerpo` 40, `a_distancia` 20, `armadura` 40, `tridente` 5, `escudo` 8, `herramienta` 12. Los ids de `TipoDeObjeto` no van en el objeto (el tipo sale del ítem), pero sí en la config y el comando.
 
 **Afijos:** tantos como `rareza.afijos()` (1 a 4), sin repetir, entre los que `sirvenPara` el tipo. El valor es `AfijoDeBotin.valor(maximo, nivel, nivelMaximo, azar, rareza)` = `maximo × (0,25 + 0,75 × nivel / nivelMaximo) × (0,75 + 0,25 × azar) × bonificación` (épica 1,1, legendaria 1,25), redondeado a 3 decimales (el fuego, a segundos enteros). El primero que sale da el nombre.
 

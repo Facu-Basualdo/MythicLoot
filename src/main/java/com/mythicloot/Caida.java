@@ -3,6 +3,7 @@ package com.mythicloot;
 import org.jspecify.annotations.Nullable;
 
 import net.minecraft.ChatFormatting;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -41,6 +42,17 @@ public final class Caida {
 	}
 
 	/**
+	 * El afijo de jefe que trae el objeto de este mob, o null: sólo un jefe de zona, con {@code afijosDeJefe.chance} y si
+	 * su especie tiene uno en {@code afijosDeJefe.porMob}.
+	 */
+	public static @Nullable AfijoDeBotin afijoDeJefe(Mob mob, Configuracion config, RandomSource random) {
+		if (!NivelDelMob.esJefe(mob) || random.nextDouble() >= config.afijosDeJefe().chance()) {
+			return null;
+		}
+		return config.afijoDeJefe(BuiltInRegistries.ENTITY_TYPE.getKey(mob.getType()).toString());
+	}
+
+	/**
 	 * AFTER_DEATH. Sólo si lo mató un jugador (la misma memoria que usa vanilla para el loot "killed_by_player": vale
 	 * también si lo remató la caída o el fuego después de un golpe) y con {@code mobDrops} prendido.
 	 */
@@ -63,9 +75,16 @@ public final class Caida {
 			return;
 		}
 		Integer nivel = NivelDelMob.nivel(mob, config);
-		ItemStack objeto = GeneradorDeBotin.generar(config, nivel == null ? 1 : nivel, rareza, GeneradorDeBotin.elegirTipo(config, random), random);
+		AfijoDeBotin deJefe = afijoDeJefe(mob, config, random);
+		ItemStack objeto = GeneradorDeBotin.generar(config, nivel == null ? 1 : nivel, rareza, GeneradorDeBotin.elegirTipo(config, random), deJefe, random);
 		ItemEntity soltado = mob.spawnAtLocation(level, objeto);
-		if (soltado != null && rareza.compareTo(Rareza.EPICA) >= 0) {
+		if (soltado != null && deJefe != null) {
+			soltado.setGlowingTag(true);
+			level.playSound(null, mob.blockPosition(), SoundEvents.UI_TOAST_CHALLENGE_COMPLETE, SoundSource.PLAYERS, 1.0f, 0.8f);
+			if (jugador instanceof ServerPlayer servidor) {
+				servidor.sendSystemMessage(Idioma.tr(servidor, "mythicloot.aviso.jefe").withStyle(ChatFormatting.RED), true);
+			}
+		} else if (soltado != null && rareza.compareTo(Rareza.EPICA) >= 0) {
 			// El contorno se ve a través de las paredes: en una pelea con escoltas, un épico no se pierde entre el loot
 			soltado.setGlowingTag(true);
 			level.playSound(null, mob.blockPosition(), rareza == Rareza.LEGENDARIA ? SoundEvents.UI_TOAST_CHALLENGE_COMPLETE : SoundEvents.PLAYER_LEVELUP,

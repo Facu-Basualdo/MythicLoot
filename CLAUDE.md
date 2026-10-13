@@ -2,9 +2,9 @@
 
 **El id es `mythicloot`** (en la 0.1.0 era `botinmitico`, que nunca se usó en un mundo: no hay nada que migrar) (paquete, comando, config, la clave del `custom_data` y los ids de los modificadores). No lo renombres: va guardado en cada objeto que ya se soltó, y un id nuevo los dejaría sin afijos.
 
-Mod de Fabric para **Minecraft Java 26.3**: los mobs hostiles que mata un jugador pueden soltar armas, arcos y armaduras con **rareza** (mágica, rara, épica, legendaria) y de 1 a 4 **afijos** al azar (más daño, robo de vida, flechas certeras, más vida…), mejores cuanto más nivel tiene el mob. Con **Bloodmoon & Bosses** el nivel es el del mob y los jefes de zona sueltan siempre uno; sin él, sale de la distancia al spawn. Java 25, Gradle 9.7 + Fabric Loom 1.18, Fabric Loader 0.19.5, Fabric API 0.162.0+26.3. Toda la lógica corre en el servidor: los objetos usan componentes de vanilla y un cliente sin el mod los ve completos.
+Mod de Fabric para **Minecraft Java 26.3**: los mobs hostiles que mata un jugador pueden soltar armas (también lanzas y mazas), arcos, tridentes, armaduras, escudos y herramientas con **rareza** (mágica, rara, épica, legendaria) y de 1 a 4 **afijos** al azar (más daño, robo de vida, flechas certeras, más vida…), mejores cuanto más nivel tiene el mob. Con **Bloodmoon & Bosses** el nivel es el del mob y los jefes de zona sueltan siempre uno, a veces con un **afijo de jefe** de su especie; sin él, sale de la distancia al spawn. Java 25, Gradle 9.7 + Fabric Loom 1.18, Fabric Loader 0.19.5, Fabric API 0.162.0+26.3. Toda la lógica corre en el servidor: los objetos usan componentes de vanilla y un cliente sin el mod los ve completos.
 
-> **Estado:** versión 0.1.0, con los gametests en verde. Falta probarlo a mano en un servidor con Bloodmoon & Bosses (ver [docs/plan.md](docs/plan.md)).
+> **Estado:** versión 0.6.0, con los gametests en verde. Falta probarlo a mano en un servidor con Bloodmoon & Bosses (ver [docs/plan.md](docs/plan.md)).
 
 ## Cómo obtener contexto
 
@@ -24,7 +24,7 @@ El mismo tema en distintas áreas usa el mismo nombre de archivo (`claude/mod/bo
 
 | Área | Carpeta | Stack | Índice |
 |---|---|---|---|
-| Mod | `src/main/` | Java 25 · Fabric API (eventos de entidades y de daño, attachments, comandos) · un accessor mixin y uno del yunque (MixinExtras) · nombres oficiales de Mojang | [claude/mod/INDICE.md](claude/mod/INDICE.md) |
+| Mod | `src/main/` | Java 25 · Fabric API (eventos de entidades y de daño, attachments, comandos) · un accessor mixin y los del tridente, el daño (afijos de jefe) y el yunque (MixinExtras) · nombres oficiales de Mojang | [claude/mod/INDICE.md](claude/mod/INDICE.md) |
 | Tests | `src/gametest/` | Fabric GameTest API · servidor sin ventana | [claude/tests/INDICE.md](claude/tests/INDICE.md) |
 
 ## Notas transversales
@@ -40,7 +40,7 @@ El mismo tema en distintas áreas usa el mismo nombre de archivo (`claude/mod/bo
 | Feature | Mod | Tests |
 |---|---|---|
 | Generar objetos (rareza, material por nivel, afijos, nombre y lore) y cuándo se sueltan (chance, jefes, campeones, Bloodmoon o distancia) | [botin](claude/mod/botin.md) | [botin](claude/tests/botin.md) |
-| Afijos: atributos de vanilla y los que aplica el mod (vampírico, ardiente, certero) | [afijos](claude/mod/afijos.md) | [botin](claude/tests/botin.md) |
+| Afijos: atributos de vanilla y los que aplica el mod (vampírico, ardiente, certero; el tridente lanzado); los 8 de jefe (`EfectosDeJefe`) | [afijos](claude/mod/afijos.md) | [botin](claude/tests/botin.md) |
 | Idioma: chat por jugador, nombre y lore traducibles con respaldo | [idioma](claude/mod/idioma.md) | [botin](claude/tests/botin.md) |
 | Juntar dos objetos en el yunque: suma los afijos, sube la rareza, cobra por afijo ganado | [yunque](claude/mod/yunque.md) | [botin](claude/tests/botin.md) |
 

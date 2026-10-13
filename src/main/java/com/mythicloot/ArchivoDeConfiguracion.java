@@ -17,6 +17,7 @@ import net.fabricmc.loader.api.FabricLoader;
 /** config/mythicloot.json: los valores de Configuracion, editables sin recompilar. */
 public final class ArchivoDeConfiguracion {
 	private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+	private static final String MOBS_DE_JEFE = "afijosDeJefe.porMob.";
 
 	private ArchivoDeConfiguracion() {
 	}
@@ -51,7 +52,10 @@ public final class ArchivoDeConfiguracion {
 		for (Map.Entry<String, JsonElement> entrada : origen.entrySet()) {
 			String clave = entrada.getKey();
 			JsonElement porDefecto = destino.get(clave);
-			if (porDefecto == null) {
+			if (porDefecto == null && (prefijo + clave).startsWith(MOBS_DE_JEFE)) {
+				// La única lista abierta: un datapack puede sumar especies a los jefes de Bloodmoon
+				destino.add(clave, entrada.getValue());
+			} else if (porDefecto == null) {
 				// Un nombre mal escrito quedaría ignorado en silencio: mejor avisar
 				MythicLoot.LOGGER.warn("Configuración: no existe la clave \"{}{}\", se ignora", prefijo, clave);
 			} else if (porDefecto.isJsonObject() && entrada.getValue().isJsonObject()) {

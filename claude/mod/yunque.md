@@ -31,6 +31,10 @@ Devuelve cuántos afijos **ganó o mejoró** el de la izquierda. Con 0 no toca n
 - **El jar de 26.3 no trae tabla de variables locales:** los `@Local` van por `ordinal` y tipo. `ItemStack` 0 = izquierda, 1 = resultado (la copia), 2 = derecha; `int` 0 = costo. Si una versión nueva cambia el método, el síntoma es que `juntarEnElYunque` falla o que el mixin no aplica al cargar (`defaultRequire: 1`). Verificá con `javap -c` (ver [minecraft-26-sin-ofuscar](../general/minecraft-26-sin-ofuscar.md)).
 - Todo es del servidor: el cliente sin el mod ve el resultado y el costo que le sincroniza el menú.
 
+## Afijo de jefe
+
+**No cuenta para el tope de 4 ni para la rareza** (`Yunque.comunes`): una legendaria de 4 todavía puede ganar uno. **Hay uno solo por objeto:** si los dos traen uno distinto, queda el de la izquierda; si traen el mismo, el valor más alto. Si no, juntando objetos se apilarían los efectos de varios jefes. Ganarlo cuenta como un afijo ganado (cobra `costoPorAfijoUnido`).
+
 ## Ver también
 
 - [Botín: generar y soltar](botin.md)

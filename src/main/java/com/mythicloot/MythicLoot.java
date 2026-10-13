@@ -37,6 +37,9 @@ public class MythicLoot implements ModInitializer {
 		ServerLivingEntityEvents.AFTER_DEATH.register(Caida::alMorir);
 		ServerLivingEntityEvents.AFTER_DAMAGE.register(Efectos::alPegar);
 		ServerEntityEvents.ENTITY_LOAD.register(Efectos::alDisparar);
+		ServerLivingEntityEvents.AFTER_DEATH.register(EfectosDeJefe::alMorir);
+		ServerLivingEntityEvents.AFTER_DAMAGE.register(EfectosDeJefe::alPegar);
+		ServerLivingEntityEvents.ALLOW_DAMAGE.register(EfectosDeJefe::esquivar);
 		CommandRegistrationCallback.EVENT.register((dispatcher, contexto, seleccion) -> ComandoBotin.registrar(dispatcher));
 	}
 

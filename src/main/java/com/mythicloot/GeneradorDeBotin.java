@@ -26,17 +26,23 @@ import net.minecraft.world.item.equipment.Equippable;
 public final class GeneradorDeBotin {
 	// Por material, de peor a mejor: cobre, hierro (cadena en armadura), hierro, diamante, netherita
 	private static final Item[][] CUERPO_A_CUERPO = {
-			{Items.COPPER_SWORD, Items.COPPER_AXE},
-			{Items.IRON_SWORD, Items.IRON_AXE},
-			{Items.IRON_SWORD, Items.IRON_AXE},
-			{Items.DIAMOND_SWORD, Items.DIAMOND_AXE},
-			{Items.NETHERITE_SWORD, Items.NETHERITE_AXE}};
+			{Items.COPPER_SWORD, Items.COPPER_AXE, Items.COPPER_SPEAR},
+			{Items.IRON_SWORD, Items.IRON_AXE, Items.IRON_SPEAR},
+			{Items.IRON_SWORD, Items.IRON_AXE, Items.IRON_SPEAR},
+			{Items.DIAMOND_SWORD, Items.DIAMOND_AXE, Items.DIAMOND_SPEAR},
+			{Items.NETHERITE_SWORD, Items.NETHERITE_AXE, Items.NETHERITE_SPEAR}};
 	private static final Item[][] ARMADURA = {
 			{Items.COPPER_HELMET, Items.COPPER_CHESTPLATE, Items.COPPER_LEGGINGS, Items.COPPER_BOOTS},
 			{Items.CHAINMAIL_HELMET, Items.CHAINMAIL_CHESTPLATE, Items.CHAINMAIL_LEGGINGS, Items.CHAINMAIL_BOOTS},
 			{Items.IRON_HELMET, Items.IRON_CHESTPLATE, Items.IRON_LEGGINGS, Items.IRON_BOOTS},
 			{Items.DIAMOND_HELMET, Items.DIAMOND_CHESTPLATE, Items.DIAMOND_LEGGINGS, Items.DIAMOND_BOOTS},
 			{Items.NETHERITE_HELMET, Items.NETHERITE_CHESTPLATE, Items.NETHERITE_LEGGINGS, Items.NETHERITE_BOOTS}};
+	private static final Item[][] HERRAMIENTA = {
+			{Items.COPPER_PICKAXE, Items.COPPER_SHOVEL},
+			{Items.IRON_PICKAXE, Items.IRON_SHOVEL},
+			{Items.IRON_PICKAXE, Items.IRON_SHOVEL},
+			{Items.DIAMOND_PICKAXE, Items.DIAMOND_SHOVEL},
+			{Items.NETHERITE_PICKAXE, Items.NETHERITE_SHOVEL}};
 	private static final Item[] A_DISTANCIA = {Items.BOW, Items.BOW, Items.CROSSBOW};
 	private static final int DIAMANTE = 3;
 
@@ -92,6 +98,14 @@ public final class GeneradorDeBotin {
 
 	/** Un objeto al azar de esa rareza y ese tipo, con los afijos ya puestos. */
 	public static ItemStack generar(Configuracion config, int nivel, Rareza rareza, TipoDeObjeto tipo, RandomSource random) {
+		return generar(config, nivel, rareza, tipo, null, random);
+	}
+
+	/**
+	 * Como la otra, más un afijo de jefe ({@code deJefe}, o null): va aparte de los de la rareza y le da el nombre al
+	 * objeto ("Espada de diamante del Verdugo").
+	 */
+	public static ItemStack generar(Configuracion config, int nivel, Rareza rareza, TipoDeObjeto tipo, @Nullable AfijoDeBotin deJefe, RandomSource random) {
 		int nivelDelObjeto = Math.clamp(nivel, 1, config.nivelMaximo());
 		ItemStack stack = new ItemStack(base(config, nivelDelObjeto, rareza, tipo, random));
 
@@ -109,6 +123,10 @@ public final class GeneradorDeBotin {
 			if (principal == null) {
 				principal = afijo;
 			}
+		}
+		if (deJefe != null) {
+			afijos.put(deJefe, redondear(deJefe, AfijoDeBotin.valor(config.valorMaximo(deJefe), nivelDelObjeto, config.nivelMaximo(), random.nextDouble(), rareza)));
+			principal = deJefe;
 		}
 
 		return armar(stack, new ObjetoConAfijos(nivelDelObjeto, rareza, afijos), principal);
@@ -154,8 +172,8 @@ public final class GeneradorDeBotin {
 		objeto.afijos().forEach((afijo, valor) -> {
 			Component linea = afijo.describir(valor);
 			if (linea != null) {
-				// Azul, como las líneas de atributos que agrega vanilla abajo
-				lore.add(Texto.lore(linea, ChatFormatting.BLUE));
+				// Azul, como las líneas de atributos que agrega vanilla abajo; el de jefe en rojo, para que se distinga
+				lore.add(Texto.lore(linea, afijo.deJefe() ? ChatFormatting.RED : ChatFormatting.BLUE));
 			}
 		});
 		stack.set(DataComponents.LORE, new ItemLore(lore));
@@ -175,6 +193,9 @@ public final class GeneradorDeBotin {
 		Equippable equipable = stack.get(DataComponents.EQUIPPABLE);
 		if (equipable != null && equipable.slot().isArmor()) {
 			grupo = EquipmentSlotGroup.bySlot(equipable.slot());
+		} else if (stack.has(DataComponents.BLOCKS_ATTACKS)) {
+			// El escudo se usa en la mano secundaria: con la principal sus afijos no valdrían nunca
+			grupo = EquipmentSlotGroup.OFFHAND;
 		}
 		ItemAttributeModifiers modificadores = stack.getOrDefault(DataComponents.ATTRIBUTE_MODIFIERS, ItemAttributeModifiers.EMPTY);
 		for (Map.Entry<AfijoDeBotin, Double> entrada : objeto.afijos().entrySet()) {
@@ -212,15 +233,28 @@ public final class GeneradorDeBotin {
 			material = DIAMANTE;
 		}
 		return switch (tipo) {
-			case CUERPO_A_CUERPO -> CUERPO_A_CUERPO[material][random.nextInt(CUERPO_A_CUERPO[material].length)];
+			case CUERPO_A_CUERPO -> cuerpoACuerpo(config, CUERPO_A_CUERPO[material], rareza, random);
 			case ARMADURA -> ARMADURA[material][random.nextInt(ARMADURA[material].length)];
 			case A_DISTANCIA -> A_DISTANCIA[random.nextInt(A_DISTANCIA.length)];
+			case HERRAMIENTA -> HERRAMIENTA[material][random.nextInt(HERRAMIENTA[material].length)];
+			case TRIDENTE -> Items.TRIDENT;
+			case ESCUDO -> Items.SHIELD;
 		};
 	}
 
-	/** El fuego en segundos enteros; el resto con tres decimales, que alcanza para un porcentaje con un decimal. */
+	/**
+	 * La maza no tiene materiales y en vanilla sale de un cofre de las cámaras de prueba: con la rareza mínima
+	 * ({@code rarezaMinimaDeMaza}) es una opción más, con la misma chance que la espada, el hacha o la lanza.
+	 */
+	private static Item cuerpoACuerpo(Configuracion config, Item[] opciones, Rareza rareza, RandomSource random) {
+		boolean maza = rareza.compareTo(config.minimaDeMaza()) >= 0;
+		int elegido = random.nextInt(opciones.length + (maza ? 1 : 0));
+		return elegido < opciones.length ? opciones[elegido] : Items.MACE;
+	}
+
+	/** El fuego y el marchitamiento en segundos enteros; el resto con tres decimales, que alcanza para un porcentaje con un decimal. */
 	private static double redondear(AfijoDeBotin afijo, double valor) {
-		if (afijo == AfijoDeBotin.ARDIENTE) {
+		if (afijo.enSegundos()) {
 			return Math.max(1, Math.round(valor));
 		}
 		return Math.round(valor * 1000) / 1000.0;

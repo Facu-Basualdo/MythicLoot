@@ -18,7 +18,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.item.ItemStack;
 
-/** {@code /mythicloot generar <nivel> [rareza] [tipo]} y {@code /mythicloot recargar}, los dos para ops. */
+/** {@code /mythicloot generar <nivel> [rareza] [tipo] [afijoDeJefe]} y {@code /mythicloot recargar}, los dos para ops. */
 public final class ComandoBotin {
 	private ComandoBotin() {
 	}
@@ -28,18 +28,23 @@ public final class ComandoBotin {
 				.requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
 				.then(Commands.literal("generar")
 						.then(Commands.argument("nivel", IntegerArgumentType.integer(1))
-								.executes(ctx -> generar(ctx, null, null))
+								.executes(ctx -> generar(ctx, null, null, null))
 								.then(Commands.argument("rareza", StringArgumentType.word())
 										.suggests((ctx, sugerencias) -> SharedSuggestionProvider.suggest(ids(Rareza.values()), sugerencias))
-										.executes(ctx -> generar(ctx, StringArgumentType.getString(ctx, "rareza"), null))
+										.executes(ctx -> generar(ctx, StringArgumentType.getString(ctx, "rareza"), null, null))
 										.then(Commands.argument("tipo", StringArgumentType.word())
 												.suggests((ctx, sugerencias) -> SharedSuggestionProvider.suggest(ids(TipoDeObjeto.values()), sugerencias))
-												.executes(ctx -> generar(ctx, StringArgumentType.getString(ctx, "rareza"), StringArgumentType.getString(ctx, "tipo")))))))
+												.executes(ctx -> generar(ctx, StringArgumentType.getString(ctx, "rareza"), StringArgumentType.getString(ctx, "tipo"), null))
+												.then(Commands.argument("afijoDeJefe", StringArgumentType.word())
+														.suggests((ctx, sugerencias) -> SharedSuggestionProvider.suggest(idsDeJefe(), sugerencias))
+														.executes(ctx -> generar(ctx, StringArgumentType.getString(ctx, "rareza"), StringArgumentType.getString(ctx, "tipo"),
+																StringArgumentType.getString(ctx, "afijoDeJefe"))))))))
 				.then(Commands.literal("recargar")
 						.executes(ComandoBotin::recargar)));
 	}
 
-	private static int generar(CommandContext<CommandSourceStack> ctx, @Nullable String idRareza, @Nullable String idTipo) throws CommandSyntaxException {
+	private static int generar(CommandContext<CommandSourceStack> ctx, @Nullable String idRareza, @Nullable String idTipo, @Nullable String idDeJefe)
+			throws CommandSyntaxException {
 		CommandSourceStack fuente = ctx.getSource();
 		ServerPlayer jugador = fuente.getPlayerOrException();
 		Configuracion config = MythicLoot.config();
@@ -57,7 +62,13 @@ public final class ComandoBotin {
 			return 0;
 		}
 
-		ItemStack objeto = GeneradorDeBotin.generar(config, nivel, rareza, tipo, random);
+		AfijoDeBotin deJefe = idDeJefe == null ? null : AfijoDeBotin.porId(idDeJefe);
+		if (idDeJefe != null && (deJefe == null || !deJefe.deJefe())) {
+			fuente.sendFailure(Idioma.tr(fuente, "mythicloot.comando.afijo_de_jefe_desconocido", idDeJefe, String.join(", ", idsDeJefe())));
+			return 0;
+		}
+
+		ItemStack objeto = GeneradorDeBotin.generar(config, nivel, rareza, tipo, deJefe, random);
 		Component nombre = objeto.getHoverName();
 		if (!jugador.getInventory().add(objeto)) {
 			jugador.spawnAtLocation(jugador.level(), objeto);
@@ -74,6 +85,10 @@ public final class ComandoBotin {
 		}
 		ctx.getSource().sendSuccess(() -> Idioma.tr(ctx.getSource(), "mythicloot.comando.recargada"), true);
 		return 1;
+	}
+
+	private static String[] idsDeJefe() {
+		return Arrays.stream(AfijoDeBotin.values()).filter(AfijoDeBotin::deJefe).map(AfijoDeBotin::id).toArray(String[]::new);
 	}
 
 	private static String[] ids(StringRepresentable[] valores) {
