@@ -119,6 +119,8 @@ Dos objetos iguales con afijos (dos espadas de cobre, dos cascos de hierro…) s
 
 En el primer arranque se crea **`config/mythicloot.json`** con los valores por defecto. Editalo y usá `/mythicloot recargar`, o reiniciá el servidor.
 
+**Desde el juego, con [Mod Menu](https://modrinth.com/mod/modmenu):** en la lista de mods, el botón de configuración de Mythic Loot abre una pantalla con todas estas opciones, con su nombre y una ayuda al pasar el mouse. Al guardar se aplica enseguida, como con `/mythicloot recargar`. Si un valor no sirve, no se guarda nada y la pantalla dice por qué. Edita el archivo de tu instalación: sirve en singleplayer, en un mundo abierto en LAN desde tu juego y para preparar la config antes de crear un mundo. El de un servidor dedicado se sigue editando en el servidor.
+
 - Si el archivo tiene un error (JSON mal escrito o un valor imposible), se queda la configuración que había, el archivo no se toca y el error aparece en el chat y en la consola.
 - Si falta una clave se usa su valor por defecto, y al leer el archivo se reescribe completo. Una clave que no existe se ignora con un aviso en la consola.
 - Los objetos que ya se soltaron no cambian: sus valores quedan guardados en cada uno.
@@ -145,10 +147,11 @@ En el primer arranque se crea **`config/mythicloot.json`** con los valores por d
 - **Bloodmoon & Bosses** (recomendado): el nivel del botín es el del mob, los campeones tienen el doble de chance y los jefes de zona sueltan siempre una épica o mejor, a veces con el afijo de su especie. Los mobs de spawners no sueltan nada. Sin Bloodmoon no hay jefes, y por eso tampoco afijos de jefe.
 - **Hero's Forge:** el robo de vida y el daño a distancia de sus estadísticas se suman a los afijos. Su esquiva y el vacío se tiran por separado, y sus resistencias se suman al bruto y a la llamarada.
 - **Soul Link:** no se tocan. Con la vida compartida, lo que cura el festín o el brebaje le llega a todo el grupo, y un golpe que el vacío esquiva no le baja la vida a nadie.
+- **[Mod Menu](https://modrinth.com/mod/modmenu)** (opcional, en el cliente): la configuración se edita desde el juego. Ver [Configuración](#configuración).
 
 ## Requisitos e instalación
 
-Minecraft Java 26.3, [Fabric Loader](https://fabricmc.net/use/) 0.19.5 o más nuevo, [Fabric API](https://modrinth.com/mod/fabric-api) y Java 25. Toda la lógica corre en el servidor.
+Minecraft Java 26.3, [Fabric Loader](https://fabricmc.net/use/) 0.19.5 o más nuevo, [Fabric API](https://modrinth.com/mod/fabric-api) y Java 25. Toda la lógica corre en el servidor; en el cliente, el mod sólo suma la pantalla de Mod Menu.
 
 - **Servidor:** copiá `mythicloot-<versión>.jar` y Fabric API a `mods/`. Los jugadores no necesitan nada: los objetos usan componentes de vanilla.
 - **Singleplayer o LAN:** en el cliente del que abre el mundo, junto con Fabric API.
@@ -158,6 +161,7 @@ Minecraft Java 26.3, [Fabric Loader](https://fabricmc.net/use/) 0.19.5 o más nu
 ```bash
 ./gradlew build          # compila y corre las pruebas; el jar queda en build/libs/
 ./gradlew runGameTest    # sólo las pruebas automáticas, en un servidor sin ventana
+./gradlew runClientGameTest   # la pantalla de configuración en un cliente de verdad (abre una ventana)
 ```
 
 Pide Java 25: si Gradle no encuentra tu JDK, agregá `org.gradle.java.installations.paths=<ruta a tu JDK 25>` a tu `~/.gradle/gradle.properties`. La documentación técnica está en [CLAUDE.md](CLAUDE.md).

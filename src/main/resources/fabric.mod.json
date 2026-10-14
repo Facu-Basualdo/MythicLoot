@@ -18,6 +18,9 @@
 	"entrypoints": {
 		"main": [
 			"com.mythicloot.MythicLoot"
+		],
+		"modmenu": [
+			"com.mythicloot.cliente.IntegracionConModMenu"
 		]
 	},
 	"mixins": [

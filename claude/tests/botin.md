@@ -48,3 +48,4 @@ Todo está en `MythicLootGameTest`.
 - [Botín: generar y soltar](../mod/botin.md)
 - [Afijos](../mod/afijos.md)
 - [Juntar en el yunque](../mod/yunque.md)
+- [Tests de la pantalla de configuración](pantalla-de-configuracion.md)

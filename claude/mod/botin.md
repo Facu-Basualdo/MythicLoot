@@ -93,3 +93,4 @@ Todo en **componentes de vanilla**: un cliente sin el mod lo ve entero, y el obj
 - [Tests: botín](../tests/botin.md)
 - [Probar en el juego](../general/probar-en-el-juego.md)
 - [Idioma](idioma.md): el nombre y el lore se guardan traducibles, con respaldo en el idioma de la config.
+- [Pantalla de configuración](pantalla-de-configuracion.md): editar este archivo desde Mod Menu.
